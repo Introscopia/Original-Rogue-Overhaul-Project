@@ -1762,6 +1762,7 @@ typedef struct ok_map_of(const char *, int) map_str_int;
 typedef struct ok_map_of(const char *, char) map_str_char; 
 typedef struct ok_map_of(const char *, void *) map_str_vptr;
 typedef struct ok_map_of(char, int) map_char_int;
+typedef struct ok_map_of(int, int) map_int_int;
 
 //ADDED BY INTROSCOPIA
 

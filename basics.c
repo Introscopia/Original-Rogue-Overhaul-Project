@@ -352,6 +352,17 @@ bool fseek_string( FILE *f, char *str ){
 	return 0;
 }
 
+bool empty_line( FILE *f ){
+	char c = getc( f );
+	if( c == '\n' ){
+		c = getc( f );
+		if( c == '\n' ){
+			return 1;
+		}
+	}
+	ungetc( c, f );
+	return 0;
+}
 
 
 

@@ -104,6 +104,7 @@ void strtrim_trailingNL( char *string );
 int lines_in_a_file( FILE* f );
 bool fseek_lines( FILE* f, int N );
 bool fseek_string( FILE *f, char *str );
+bool empty_line( FILE *f );
 
 void get_filenames( char *directory, char ***list, int *length );
 
