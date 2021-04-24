@@ -11,7 +11,7 @@
  */
 
 #include <stdlib.h>
-#include <curses.h>
+// #include <curses.h>
 #include <string.h>
 #include <ctype.h>
 #include "rogue.h"
@@ -557,13 +557,13 @@ call_it(struct obj_info *info)
     else if (!info->oi_guess)
     {
 	msg(terse ? "call it: " : "what do you want to call it? ");
-	if (get_str(prbuf, stdscr) == NORM)
-	{
-	    if (info->oi_guess != NULL)
-		memfree(info->oi_guess);
-	    info->oi_guess = memalloc((unsigned int) strlen(prbuf) + 1);
-	    strcpy(info->oi_guess, prbuf);
-	}
+	// if (get_str(prbuf, stdscr) == NORM)
+	// {
+	//     if (info->oi_guess != NULL)
+	// 	memfree(info->oi_guess);
+	//     info->oi_guess = memalloc((unsigned int) strlen(prbuf) + 1);
+	//     strcpy(info->oi_guess, prbuf);
+	// }
     }
 }
 

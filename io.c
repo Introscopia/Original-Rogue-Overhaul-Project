@@ -5,7 +5,7 @@
  */
 
 #include <stdarg.h>
-#include <curses.h>
+// #include <curses.h>
 #include <ctype.h>
 #include <string.h>
 #include "rogue.h"
@@ -297,9 +297,9 @@ fatal(char *fmt, ...)
 void
 show_win(char *message)
 {
-    WINDOW *win;
+    // WINDOW *win;
 
-    win = hw;
+    // win = hw;
     wmove(win, 0, 0);
     waddstr(win, message);
     touchwin(win);
@@ -308,5 +308,4 @@ show_win(char *message)
     wait_for(' ');
     clearok(curscr, TRUE);
     touchwin(stdscr);
-         win = hw;
 }

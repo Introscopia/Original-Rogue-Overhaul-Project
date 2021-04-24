@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <curses.h>
+// #include <curses.h>
 #include <ctype.h>
 #include "rogue.h"
 
@@ -789,13 +789,13 @@ norm:
 	strcpy(prbuf, "");
     else
 	strcpy(prbuf, elsewise);
-    if (get_str(prbuf, stdscr) == NORM)
-    {
-	if (*guess != NULL)
-	    memfree(*guess);
-	*guess = memalloc((unsigned int) strlen(prbuf) + 1);
-	strcpy(*guess, prbuf);
-    }
+    // if (get_str(prbuf, stdscr) == NORM)
+    // {
+	// if (*guess != NULL)
+	//     memfree(*guess);
+	// *guess = memalloc((unsigned int) strlen(prbuf) + 1);
+	// strcpy(*guess, prbuf);
+    // }
 }
 
 /*

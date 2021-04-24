@@ -16,7 +16,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
-#include <curses.h>
+// #include <curses.h>
 #include "rogue.h"
 #include "score.h"
 
@@ -74,12 +74,12 @@ over:
 	mpos = 0;
 	msg("file name: ");
 	buf[0] = '\0';
-	if (get_str(buf, stdscr) == QUIT)
-	{
-quit_it:
-	    msg("");
-	    return;
-	}
+// 	if (get_str(buf, stdscr) == QUIT)
+// 	{
+// quit_it:
+// 	    msg("");
+// 	    return;
+// 	}
 	mpos = 0;
 gotfile:
 	/*
@@ -92,7 +92,7 @@ gotfile:
 		msg("File exists.  Do you wish to overwrite it?");
 		mpos = 0;
 		if ((c = readchar()) == ESCAPE)
-		    goto quit_it;
+		    // goto quit_it;
 		if (c == 'y' || c == 'Y')
 		    break;
 		else if (c == 'n' || c == 'N')
@@ -211,7 +211,7 @@ restore(char *file, char **envp)
         return(FALSE);
     }
 
-    hw = newwin(LINES, COLS, 0, 0);
+    // hw = newwin(LINES, COLS, 0, 0);
     setup();
 
     rs_restore_file(inf);

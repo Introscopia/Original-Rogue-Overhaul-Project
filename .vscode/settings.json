@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "curses.h": "c",
+        "ctype.h": "c",
+        "rogue.h": "c",
+        "stdbool.h": "c",
+        "extern.h": "c",
+        "assert.h": "c"
+    }
+}

@@ -10,8 +10,11 @@
  * See the file LICENSE.TXT for full copyright and licensing information.
  */
 
-#include <curses.h>
+// #include <curses.h>
 #include "rogue.h"
+
+#define TRUE true
+#define FALSE false
 
 bool after;				/* True if we want after daemons */
 bool again;				/* Repeating the last command */
@@ -166,7 +169,7 @@ THING *mlist = NULL;			/* List of monsters on the level */
 THING player;				/* His stats */
 					/* restart of game */
 
-WINDOW *hw = NULL;			/* used as a scratch window */
+// WINDOW *hw = NULL;			/* used as a scratch window */
 
 #define INIT_STATS { 16, 0, 1, 10, 12, "1x4", 12 }
 

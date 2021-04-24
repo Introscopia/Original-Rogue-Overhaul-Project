@@ -10,13 +10,118 @@
  * See the file LICENSE.TXT for full copyright and licensing information.
  */
 
+#include <stdio.h>
+#include <stdbool.h>
 #include "extern.h"
 #include "dmalloc.h"
 
 #undef lines 
 
-#define NOOP(x) (x += 0)
+#define NOOP(...) 0
 #define CCHAR(x) ( (char) (x & A_CHARTEXT) )
+
+#ifndef TRUE
+#define TRUE true
+#endif
+
+#ifndef FALSE
+#define FALSE false
+#endif
+
+#define hw (void *)0
+#define win (void *)0
+#define WINDOW void
+
+#define MAXINP 30
+
+#define stdscr 0
+#define wmove NOOP
+#define waddch NOOP
+#define waddnstr NOOP
+#define refresh NOOP
+#define wrefresh NOOP
+#define LINES 24
+#define wattrset 0
+#define curscr 0
+#define clear NOOP
+#define wclear NOOP
+#define COLS 80
+#define winch NOOP
+#define unctrl NOOP
+#define clearok NOOP
+#define wtouchln 0
+#define wclrtoeol 0
+#define raw NOOP
+#define printw NOOP
+#define mvwprintw NOOP
+#define mvcur NOOP
+#define keypad NOOP
+#define delwin NOOP
+#define wprintw NOOP
+#define noecho NOOP
+#define newwin NOOP
+#define leaveok NOOP
+#define nocbreak NOOP
+#define mvwin NOOP
+#define mvprintw NOOP
+#define initscr NOOP
+#define idlok NOOP
+#define wgetnstr NOOP
+#define wgetch 0
+#define werase NOOP
+#define erasechar NOOP
+#define subwin NOOP
+#define killchar NOOP
+#define isendwin NOOP
+#define halfdelay NOOP
+#define flushinp NOOP
+#define ESCDELAY 0
+#define cur_term 0
+#define baudrate NOOP
+#define mvaddch NOOP
+#define move NOOP
+#define addch NOOP
+#define standout NOOP
+#define standend NOOP
+#define mvinch NOOP
+#define mvwinch NOOP
+#define touchwin NOOP
+#define A_CHARTEXT 0
+#define inch NOOP
+#define endwin NOOP
+#define addstr NOOP
+#define waddstr NOOP
+#define clrtoeol NOOP
+#define mvaddstr NOOP
+#define getyx NOOP
+#define tcgetattr NOOP
+#define getgid NOOP
+#define getloadavg NOOP
+#define mvwaddch NOOP
+#define getmaxx NOOP
+#define getmaxy NOOP
+
+#define ERR 0
+
+#define KEY_LEFT (char)16
+#define KEY_RIGHT (char)0
+#define KEY_UP (char)1
+#define KEY_DOWN (char)2
+#define KEY_HOME (char)3
+#define KEY_PPAGE (char)4
+#define KEY_NPAGE (char)5
+#define KEY_END (char)6
+#define KEY_A1 (char)7
+#define KEY_A2 (char)8
+#define KEY_A3 (char)9
+#define KEY_B1 (char)10
+#define KEY_B2 (char)11
+#define KEY_B3 (char)12
+#define KEY_C1 (char)13
+#define KEY_C2 (char)14
+#define KEY_C3 (char)15
+
+
 /*
  * Maximum number of different things
  */
@@ -516,7 +621,7 @@ extern unsigned int	numscores;
 
 extern int	dnum, e_levels[], seed;
 
-extern WINDOW	*hw;
+// extern WINDOW	*hw;
 
 extern coord	delta, oldpos, stairs;
 
@@ -768,11 +873,18 @@ char	*ring_num(THING *obj);
 char	*set_mname(THING *tp);
 char	*vowelstr(char *str);
 
-int	get_bool(void *vp, WINDOW *win);
-int	get_inv_t(void *vp, WINDOW *win);
-int	get_num(void *vp, WINDOW *win);
-int	get_sf(void *vp, WINDOW *win);
-int	get_str(void *vopt, WINDOW *win);
+// int	get_bool(void *vp, WINDOW *win);
+// int	get_inv_t(void *vp, WINDOW *win);
+// int	get_num(void *vp, WINDOW *win);
+// int	get_sf(void *vp, WINDOW *win);
+// int	get_str(void *vopt, WINDOW *win);
+
+#define get_bool NULL
+#define get_inv_t NULL
+#define get_num NULL
+#define get_sf NULL
+#define get_str NULL
+
 int	trip_ch(int y, int x, int ch);
 
 coord	*find_dest(THING *tp);

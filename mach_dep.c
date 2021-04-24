@@ -46,11 +46,11 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <time.h>
-#include <curses.h>
+// #include <curses.h>
 #include "extern.h"
 #include "rogue.h"
 
-#define NOOP(x) (x += 0)
+// #define NOOP(x) (x += 0)
 
 # ifndef NUMSCORES
 #	define	NUMSCORES	10

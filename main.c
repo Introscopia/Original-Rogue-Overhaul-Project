@@ -12,7 +12,7 @@
 #include <string.h>
 #include <signal.h>
 #include <time.h>
-#include <curses.h>
+// #include <curses.h>
 #include "rogue.h"
 
 /*
@@ -160,7 +160,7 @@ main(int argc, char **argv, char **envp)
     /*
      * Set up windows
      */
-    hw = newwin(LINES, COLS, 0, 0);
+    // hw = newwin(LINES, COLS, 0, 0);
     idlok(stdscr, TRUE);
     idlok(hw, TRUE);
 #ifdef MASTER

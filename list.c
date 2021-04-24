@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <curses.h>
+// #include <curses.h>
 #include "rogue.h"
 
 int total = 0;			/* total dynamic memory bytes */

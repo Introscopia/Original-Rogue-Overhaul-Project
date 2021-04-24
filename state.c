@@ -31,7 +31,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <curses.h>
+// #include <curses.h>
 #include "rogue.h"
 
 /************************************************************************/
@@ -716,7 +716,7 @@ rs_read_coord(FILE *inf, coord *c)
 }
 
 int
-rs_write_window(FILE *savef, WINDOW *win)
+rs_write_window(FILE *savef, WINDOW *w)
 {
     int row,col,height,width;
 
@@ -739,7 +739,7 @@ rs_write_window(FILE *savef, WINDOW *win)
 }
 
 int
-rs_read_window(FILE *inf, WINDOW *win)
+rs_read_window(FILE *inf, WINDOW *w)
 {
     int row,col,maxlines,maxcols,value,width,height;
     
@@ -2004,7 +2004,7 @@ rs_save_file(FILE *savef)
     rs_write_coord(savef, nh);                          /* 5.4-move.c    */
     rs_write_int(savef, group);                         /* 5.4-weapons.c */
 
-    rs_write_window(savef,stdscr);
+    // rs_write_window(savef,stdscr);
 
     return(WRITESTAT);
 }

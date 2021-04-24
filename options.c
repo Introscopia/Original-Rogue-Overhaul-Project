@@ -13,7 +13,7 @@
  */
 
 #include <stdlib.h>
-#include <curses.h>
+// #include <curses.h>
 #include <ctype.h>
 #include <string.h>
 #include "rogue.h"
@@ -32,7 +32,7 @@ struct optstruct {
 				/* function to print value */
     void 	(*o_putfunc)(void *opt);
 				/* function to get value interactively */
-    int		(*o_getfunc)(void *opt, WINDOW *win);
+    int		(*o_getfunc)(void *opt, WINDOW *w);
 };
 
 typedef struct optstruct	OPTION;
@@ -163,211 +163,211 @@ put_inv_t(void *ip)
     waddstr(hw, inv_t_name[*(int *) ip]);
 }
 
-/*
- * get_bool:
- *	Allow changing a boolean option and print it out
- */
-int
-get_bool(void *vp, WINDOW *win)
-{
-    bool *bp = (bool *) vp;
-    int oy, ox;
-    bool op_bad;
+// /*
+//  * get_bool:
+//  *	Allow changing a boolean option and print it out
+//  */
+// int
+// get_bool(void *vp, WINDOW *win)
+// {
+//     bool *bp = (bool *) vp;
+//     int oy, ox;
+//     bool op_bad;
 
-    op_bad = TRUE;
-    getyx(win, oy, ox);
-    waddstr(win, *bp ? "True" : "False");
-    while (op_bad)	
-    {
-	wmove(win, oy, ox);
-	wrefresh(win);
-	switch (readchar())
-	{
-	    case 't':
-	    case 'T':
-		*bp = TRUE;
-		op_bad = FALSE;
-		break;
-	    case 'f':
-	    case 'F':
-		*bp = FALSE;
-		op_bad = FALSE;
-		break;
-	    case '\n':
-	    case '\r':
-		op_bad = FALSE;
-		break;
-	    case ESCAPE:
-		return QUIT;
-	    case '-':
-		return MINUS;
-	    default:
-		wmove(win, oy, ox + 10);
-		waddstr(win, "(T or F)");
-	}
-    }
-    wmove(win, oy, ox);
-    waddstr(win, *bp ? "True" : "False");
-    waddch(win, '\n');
-    return NORM;
-}
+//     op_bad = TRUE;
+//     getyx(win, oy, ox);
+//     waddstr(win, *bp ? "True" : "False");
+//     while (op_bad)	
+//     {
+// 	wmove(win, oy, ox);
+// 	wrefresh(win);
+// 	switch (readchar())
+// 	{
+// 	    case 't':
+// 	    case 'T':
+// 		*bp = TRUE;
+// 		op_bad = FALSE;
+// 		break;
+// 	    case 'f':
+// 	    case 'F':
+// 		*bp = FALSE;
+// 		op_bad = FALSE;
+// 		break;
+// 	    case '\n':
+// 	    case '\r':
+// 		op_bad = FALSE;
+// 		break;
+// 	    case ESCAPE:
+// 		return QUIT;
+// 	    case '-':
+// 		return MINUS;
+// 	    default:
+// 		wmove(win, oy, ox + 10);
+// 		waddstr(win, "(T or F)");
+// 	}
+//     }
+//     wmove(win, oy, ox);
+//     waddstr(win, *bp ? "True" : "False");
+//     waddch(win, '\n');
+//     return NORM;
+// }
 
-/*
- * get_sf:
- *	Change value and handle transition problems from see_floor to
- *	!see_floor.
- */
-int
-get_sf(void *vp, WINDOW *win)
-{
-    bool	*bp = (bool *) vp;
-    bool	was_sf;
-    int		retval;
+// /*
+//  * get_sf:
+//  *	Change value and handle transition problems from see_floor to
+//  *	!see_floor.
+//  */
+// int
+// get_sf(void *vp, WINDOW *win)
+// {
+//     bool	*bp = (bool *) vp;
+//     bool	was_sf;
+//     int		retval;
 
-    was_sf = see_floor;
-    retval = get_bool(bp, win);
-    if (retval == QUIT) return(QUIT);
-    if (was_sf != see_floor)
-    {
-	if (!see_floor) {
-	    see_floor = TRUE;
-	    erase_lamp(&hero, proom);
-	    see_floor = FALSE;
-	}
-	else
-	    look(FALSE);
-    }
-    return(NORM);
-}
+//     was_sf = see_floor;
+//     retval = get_bool(bp, win);
+//     if (retval == QUIT) return(QUIT);
+//     if (was_sf != see_floor)
+//     {
+// 	if (!see_floor) {
+// 	    see_floor = TRUE;
+// 	    erase_lamp(&hero, proom);
+// 	    see_floor = FALSE;
+// 	}
+// 	else
+// 	    look(FALSE);
+//     }
+//     return(NORM);
+// }
 
-/*
- * get_str:
- *	Set a string option
- */
-#define MAXINP	50	/* max string to read from terminal or environment */
+// /*
+//  * get_str:
+//  *	Set a string option
+//  */
+// #define MAXINP	50	/* max string to read from terminal or environment */
 
-int
-get_str(void *vopt, WINDOW *win)
-{
-    char *opt = (char *) vopt;
-    char *sp;
-    int oy, ox;
-    int i;
-    signed char c;
-    static char buf[MAXSTR];
+// int
+// get_str(void *vopt, WINDOW *win)
+// {
+//     char *opt = (char *) vopt;
+//     char *sp;
+//     int oy, ox;
+//     int i;
+//     signed char c;
+//     static char buf[MAXSTR];
 
-    getyx(win, oy, ox);
-    wrefresh(win);
-    /*
-     * loop reading in the string, and put it in a temporary buffer
-     */
-    for (sp = buf; (c = readchar()) != '\n' && c != '\r' && c != ESCAPE;
-	wclrtoeol(win), wrefresh(win))
-    {
-	if (c == -1)
-	    continue;
-	else if (md_is_erasechar(c))	/* process erase character */
-	{
-	    if (sp > buf)
-	    {
-		sp--;
-		for (i = (int) strlen(unctrl(*sp)); i; i--)
-		    waddch(win, '\b');
-	    }
-	    continue;
-	}
-	else if (c == killchar())	/* process kill character */
-	{
-	    sp = buf;
-	    wmove(win, oy, ox);
-	    continue;
-	}
-	else if (sp == buf)
-	{
-	    if (c == '-' && win != stdscr)
-		break;
-	    else if (c == '~')
-	    {
-		strcpy(buf, home);
-		waddstr(win, home);
-		sp += strlen(home);
-		continue;
-	    }
-	}
-	if (sp >= &buf[MAXINP] || !(isprint(c) || c == ' '))
-	    putchar(CTRL('G'));
-	else
-	{
-	    *sp++ = c;
-	    waddstr(win, unctrl(c));
-	}
-    }
-    *sp = '\0';
-    if (sp > buf)	/* only change option if something has been typed */
-	strucpy(opt, buf, (int) strlen(buf));
-    mvwprintw(win, oy, ox, "%s\n", opt);
-    wrefresh(win);
-    if (win == stdscr)
-	mpos += (int)(sp - buf);
-    if (c == '-')
-	return MINUS;
-    else if (c == ESCAPE)
-	return QUIT;
-    else
-	return NORM;
-}
+//     getyx(win, oy, ox);
+//     wrefresh(win);
+//     /*
+//      * loop reading in the string, and put it in a temporary buffer
+//      */
+//     for (sp = buf; (c = readchar()) != '\n' && c != '\r' && c != ESCAPE;
+// 	wclrtoeol(win), wrefresh(win))
+//     {
+// 	if (c == -1)
+// 	    continue;
+// 	else if (md_is_erasechar(c))	/* process erase character */
+// 	{
+// 	    if (sp > buf)
+// 	    {
+// 		sp--;
+// 		for (i = (int) strlen(unctrl(*sp)); i; i--)
+// 		    waddch(win, '\b');
+// 	    }
+// 	    continue;
+// 	}
+// 	else if (c == killchar())	/* process kill character */
+// 	{
+// 	    sp = buf;
+// 	    wmove(win, oy, ox);
+// 	    continue;
+// 	}
+// 	else if (sp == buf)
+// 	{
+// 	    if (c == '-' && win != stdscr)
+// 		break;
+// 	    else if (c == '~')
+// 	    {
+// 		strcpy(buf, home);
+// 		waddstr(win, home);
+// 		sp += strlen(home);
+// 		continue;
+// 	    }
+// 	}
+// 	if (sp >= &buf[MAXINP] || !(isprint(c) || c == ' '))
+// 	    putchar(CTRL('G'));
+// 	else
+// 	{
+// 	    *sp++ = c;
+// 	    waddstr(win, unctrl(c));
+// 	}
+//     }
+//     *sp = '\0';
+//     if (sp > buf)	/* only change option if something has been typed */
+// 	strucpy(opt, buf, (int) strlen(buf));
+//     mvwprintw(win, oy, ox, "%s\n", opt);
+//     wrefresh(win);
+//     if (win == stdscr)
+// 	mpos += (int)(sp - buf);
+//     if (c == '-')
+// 	return MINUS;
+//     else if (c == ESCAPE)
+// 	return QUIT;
+//     else
+// 	return NORM;
+// }
 
-/*
- * get_inv_t
- *	Get an inventory type name
- */
-int
-get_inv_t(void *vp, WINDOW *win)
-{
-    int *ip = (int *) vp;
-    int oy, ox;
-    bool op_bad;
+// /*
+//  * get_inv_t
+//  *	Get an inventory type name
+//  */
+// int
+// get_inv_t(void *vp, WINDOW *win)
+// {
+//     int *ip = (int *) vp;
+//     int oy, ox;
+//     bool op_bad;
 
-    op_bad = TRUE;
-    getyx(win, oy, ox);
-    waddstr(win, inv_t_name[*ip]);
-    while (op_bad)	
-    {
-	wmove(win, oy, ox);
-	wrefresh(win);
-	switch (readchar())
-	{
-	    case 'o':
-	    case 'O':
-		*ip = INV_OVER;
-		op_bad = FALSE;
-		break;
-	    case 's':
-	    case 'S':
-		*ip = INV_SLOW;
-		op_bad = FALSE;
-		break;
-	    case 'c':
-	    case 'C':
-		*ip = INV_CLEAR;
-		op_bad = FALSE;
-		break;
-	    case '\n':
-	    case '\r':
-		op_bad = FALSE;
-		break;
-	    case ESCAPE:
-		return QUIT;
-	    case '-':
-		return MINUS;
-	    default:
-		wmove(win, oy, ox + 15);
-		waddstr(win, "(O, S, or C)");
-	}
-    }
-    mvwprintw(win, oy, ox, "%s\n", inv_t_name[*ip]);
-    return NORM;
-}
+//     op_bad = TRUE;
+//     getyx(win, oy, ox);
+//     waddstr(win, inv_t_name[*ip]);
+//     while (op_bad)	
+//     {
+// 	wmove(win, oy, ox);
+// 	wrefresh(win);
+// 	switch (readchar())
+// 	{
+// 	    case 'o':
+// 	    case 'O':
+// 		*ip = INV_OVER;
+// 		op_bad = FALSE;
+// 		break;
+// 	    case 's':
+// 	    case 'S':
+// 		*ip = INV_SLOW;
+// 		op_bad = FALSE;
+// 		break;
+// 	    case 'c':
+// 	    case 'C':
+// 		*ip = INV_CLEAR;
+// 		op_bad = FALSE;
+// 		break;
+// 	    case '\n':
+// 	    case '\r':
+// 		op_bad = FALSE;
+// 		break;
+// 	    case ESCAPE:
+// 		return QUIT;
+// 	    case '-':
+// 		return MINUS;
+// 	    default:
+// 		wmove(win, oy, ox + 15);
+// 		waddstr(win, "(O, S, or C)");
+// 	}
+//     }
+//     mvwprintw(win, oy, ox, "%s\n", inv_t_name[*ip]);
+//     return NORM;
+// }
 	
 
 #ifdef MASTER

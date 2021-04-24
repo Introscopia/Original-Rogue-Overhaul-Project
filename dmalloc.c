@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <assert.h>
+// #include <assert.h>
 #include <memory.h>
 
 #define MAX_MALLOC_SIZE (16 * 1024 * 1024)              /* arbitrary - change for your application */
@@ -51,7 +51,7 @@ void *memalloc(size_t size)
         m_header_t *hdr;
         m_trailer_t *tlr;
         void *data;
-        assert(size <= MAX_MALLOC_SIZE);
+        // assert(size <= MAX_MALLOC_SIZE);
         actual_size = calculate_actual_size(roundup_size(size));
         data = malloc(actual_size);
         if (data == NULL)
@@ -73,12 +73,12 @@ void memfree(void *data)
         if (data == NULL)
                 return;
         hdr = buf_to_header(data);
-        assert(hdr->m_magic == M_HEADER_MAGIC);
-        assert(hdr->m_size <= MAX_MALLOC_SIZE);
+        // assert(hdr->m_magic == M_HEADER_MAGIC);
+        // assert(hdr->m_size <= MAX_MALLOC_SIZE);
         tlr = header_to_trailer(hdr);
-        assert(tlr->m_magic == M_TRAILER_MAGIC);
-        assert(tlr->m_size <= MAX_MALLOC_SIZE);
-        assert(hdr->m_size == tlr->m_size);
+        // assert(tlr->m_magic == M_TRAILER_MAGIC);
+        // assert(tlr->m_size <= MAX_MALLOC_SIZE);
+        // assert(hdr->m_size == tlr->m_size);
         memset(hdr, MEM_FREE_PATTERN, calculate_actual_size(hdr->m_size));
         free(hdr);
 }
