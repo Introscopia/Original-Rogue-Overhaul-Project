@@ -15,59 +15,73 @@
 // #include <curses.h>
 #include "rogue.h"
 
+#include <SDL2/SDL.h>
+
+SDL_Window *window;
+SDL_Renderer *renderer;
 /*
  * main:
  *	The main program, of course
  */
-int
-main(int argc, char **argv, char **envp)
+int main(int argc, char **argv)
 {
     char *env;
     int lowtime;
 
     md_init();
 
+    SDL_Init(SDL_INIT_VIDEO); // Initialize SDL2
+
+    // Create an application window with the following settings:
+    SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
+
     /*
      * FIXME: do better arg processing
      */
-    while (argc >= 2) {
+    while (argc >= 2)
+    {
 #ifdef MASTER
-	if (strcmp(argv[1], "-w") == 0) {
-	    if (strcmp(PASSWD, md_crypt(md_getpass("wizard's password: "), "mT")) == 0)
-	    {
-	        wizard = TRUE;
-	        player.t_flags |= SEEMONST;
-	    }
+        if (strcmp(argv[1], "-w") == 0)
+        {
+            if (strcmp(PASSWD, md_crypt(md_getpass("wizard's password: "), "mT")) == 0)
+            {
+                wizard = TRUE;
+                player.t_flags |= SEEMONST;
+            }
             argc--;
             argv++;
-	    continue;
-	}
+            continue;
+        }
 #endif
-	if (strcmp(argv[1], "-r") == 0) {
+        if (strcmp(argv[1], "-r") == 0)
+        {
             rookie_mode = TRUE;
             argc--;
             argv++;
-	    continue;
-	}
-        if (strcmp(argv[1], "-5.3") == 0) {
+            continue;
+        }
+        if (strcmp(argv[1], "-5.3") == 0)
+        {
             rogue_version = VERSION_5_3;
             argc--;
             argv++;
-	    continue;
+            continue;
         }
-        if (strcmp(argv[1], "-5.4") == 0) {
+        if (strcmp(argv[1], "-5.4") == 0)
+        {
             rogue_version = VERSION_5_4;
             argc--;
             argv++;
-	    continue;
-	}
-	if (strncmp(argv[1], "-", 1) == 0) {
+            continue;
+        }
+        if (strncmp(argv[1], "-", 1) == 0)
+        {
             printf("rogue: WARNING: ignoring unknown option %s\n", argv[1]);
             argc--;
             argv++;
-	    continue;
-	}
-	break;
+            continue;
+        }
+        break;
     }
 
     /*
@@ -80,59 +94,57 @@ main(int argc, char **argv, char **envp)
     strcat(file_name, "rogue.save");
 
     if ((env = getenv("ROGUEOPTS")) != NULL)
-	parse_opts(env);
+        parse_opts(env);
     if (env == NULL || whoami[0] == '\0')
-        strucpy(whoami, md_getusername(), (int) strlen(md_getusername()));
-    lowtime = (int) time(NULL);
+        strucpy(whoami, md_getusername(), (int)strlen(md_getusername()));
+    lowtime = (int)time(NULL);
 #ifdef MASTER
     if (wizard && getenv("SEED") != NULL)
-	dnum = atoi(getenv("SEED"));
+        dnum = atoi(getenv("SEED"));
     else
 #endif
-    dnum = lowtime + md_getpid();
+        dnum = lowtime + md_getpid();
     seed = dnum;
 
     open_score();
 
     /* 
      * Drop setuid/setgid after opening the scoreboard file. 
-     */ 
+     */
     md_normaluser();
 
     /*
      * check for print-score option
      */
 
-    if (argc == 2 && strcmp(argv[1], "-s") == 0) {
-	noscore = TRUE;
-	score(0, -1, 0);
+    if (argc == 2 && strcmp(argv[1], "-s") == 0)
+    {
+        noscore = TRUE;
+        score(0, -1, 0);
         md_deinit();
-	exit(0);
+        exit(0);
     }
 
-    init_check();			/* check for legal startup */
-    if (argc == 2)
-	if (!restore(argv[1], envp))	/* Note: restore will never return */
-	    my_exit(1);
+    init_check(); /* check for legal startup */
     printf("Hello %s %s, just a moment while I dig the dungeon...", (rookie_mode ? "rookie" : "warrior"), whoami);
 #ifdef MASTER
     if (wizard)
-	printf(" #%d", dnum);
+        printf(" #%d", dnum);
 #endif
     fflush(stdout);
 
     md_sleep(1); /* allow enough time to see the message */
 
-    initscr();				/* Start up cursor package */
-    init_probs();			/* Set up prob tables for objects */
-    init_names();			/* Set up names of scrolls */
-    init_colors();			/* Set up colors of potions */
-    init_stones();			/* Set up stone settings of rings */
-    init_materials();			/* Set up materials of wands */
+    initscr();        /* Start up cursor package */
+    init_probs();     /* Set up prob tables for objects */
+    init_names();     /* Set up names of scrolls */
+    init_colors();    /* Set up colors of potions */
+    init_stones();    /* Set up stone settings of rings */
+    init_materials(); /* Set up materials of wands */
     /*
      * Must call this after all of the above.
      */
-    init_player();			/* Set up initial player stats and objects */
+    init_player(); /* Set up initial player stats and objects */
     setup();
 
     /*
@@ -140,21 +152,21 @@ main(int argc, char **argv, char **envp)
      */
     if (LINES < NUMLINES || COLS < NUMCOLS)
     {
-	endwin();
-	printf("\nsorry, the screen is %dx%d, must be at least %dx%d\n", LINES, COLS, NUMLINES, COLS, NUMCOLS);
+        endwin();
+        printf("\nsorry, the screen is %dx%d, must be at least %dx%d\n", LINES, COLS, NUMLINES, COLS, NUMCOLS);
         fflush(stdout);
-	my_exit(1);
+        my_exit(1);
     }
 
     /*
      * The screen must be no larger than NUMLINES+2 x NUMCOLS+2
      */
-    if (LINES > (NUMLINES+2) || COLS > (NUMCOLS+2))
+    if (LINES > (NUMLINES + 2) || COLS > (NUMCOLS + 2))
     {
-	endwin();
-	printf("\nsorry, the screen is %dx%d, must be no larger than %dx%d\n", LINES, COLS, NUMLINES+2, NUMCOLS+2);
+        endwin();
+        printf("\nsorry, the screen is %dx%d, must be no larger than %dx%d\n", LINES, COLS, NUMLINES + 2, NUMCOLS + 2);
         fflush(stdout);
-	my_exit(1);
+        my_exit(1);
     }
 
     /*
@@ -166,7 +178,7 @@ main(int argc, char **argv, char **envp)
 #ifdef MASTER
     noscore = wizard;
 #endif
-    new_level();			/* Draw current level */
+    new_level(); /* Draw current level */
     /*
      * Start up daemons and fuses
      */
@@ -175,7 +187,7 @@ main(int argc, char **argv, char **envp)
     fuse(swander, 0, WANDERTIME, AFTER);
     start_daemon(stomach, 0, AFTER);
     playit();
-    return(0);
+    return (0);
 }
 
 /*
@@ -183,8 +195,7 @@ main(int argc, char **argv, char **envp)
  *	Exit the program abnormally.
  */
 
-void
-endit(int sig)
+void endit(int sig)
 {
     NOOP(sig);
     fatal("Okay, bye bye!\n");
@@ -194,23 +205,21 @@ endit(int sig)
  * rnd:
  *	Pick a very random number.
  */
-int
-rnd(int range)
+int rnd(int range)
 {
-    return range == 0 ? 0 : abs((int) RN) % range;
+    return range == 0 ? 0 : abs((int)RN) % range;
 }
 
 /*
  * roll:
  *	Roll a number of dice
  */
-int 
-roll(int number, int sides)
+int roll(int number, int sides)
 {
     int dtotal = 0;
 
     while (number--)
-	dtotal += rnd(sides)+1;
+        dtotal += rnd(sides) + 1;
     return dtotal;
 }
 
@@ -219,13 +228,12 @@ roll(int number, int sides)
  *	Handle stop and start signals
  */
 
-void
-tstp(int ignored)
+void tstp(int ignored)
 {
     int y, x;
     int oy, ox;
 
-	NOOP(ignored);
+    NOOP(ignored);
 
     /*
      * leave nicely
@@ -235,15 +243,15 @@ tstp(int ignored)
     endwin();
     resetltchars();
     fflush(stdout);
-	md_tstpsignal();
+    md_tstpsignal();
 
     /*
      * start back up again
      */
-	md_tstpresume();
+    md_tstpresume();
     raw();
     noecho();
-    keypad(stdscr,1);
+    keypad(stdscr, 1);
     playltchars();
     clearok(curscr, TRUE);
     wrefresh(curscr);
@@ -259,8 +267,7 @@ tstp(int ignored)
  *	refreshing things and looking at the proper times.
  */
 
-void
-playit()
+void playit()
 {
     char *opts;
 
@@ -270,26 +277,86 @@ playit()
 
     if (baudrate() <= 1200)
     {
-	terse = TRUE;
-	jump = TRUE;
-	see_floor = FALSE;
+        terse = TRUE;
+        jump = TRUE;
+        see_floor = FALSE;
     }
 
     if (md_hasclreol())
-	inv_type = INV_CLEAR;
+        inv_type = INV_CLEAR;
 
     /*
      * parse environment declaration of options
      */
     if ((opts = getenv("ROGUEOPTS")) != NULL)
-	parse_opts(opts);
-
+        parse_opts(opts);
 
     oldpos = hero;
     oldrp = roomin(&hero);
+
+    SDL_Event event;
+
     while (playing)
-	command();			/* Command execution */
-    endit(0);
+    {
+        while (SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+            case SDL_QUIT:
+                playing = 0;
+                break;
+            case SDL_KEYDOWN:
+                for (int i = 0; i < MAXLINES; i++)
+                {
+                    for (int j = 0; j < MAXCOLS; j++)
+                    {
+                        char p = INDEX(i, j)->p_ch;
+
+                        printf("%c", p);
+                    }
+                    printf("\n");
+                }
+                break;
+            case SDL_KEYUP:
+                break;
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        for (int i = 0; i < MAXLINES; i++)
+        {
+            for (int j = 0; j < MAXCOLS; j++)
+            {
+                char p = INDEX(i, j)->p_ch;
+
+                if (INDEX(i, j)->p_flags & F_REAL == 0)
+                    continue;
+
+                if (p == '.')
+                {
+                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                    SDL_RenderDrawPoint(renderer, j * 5, i * 5);
+                }
+                else if (p == '#')
+                {
+                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                    SDL_RenderDrawPoint(renderer, j * 5, i * 5);
+                }
+                else if (p == '-' || p == '|')
+                {
+                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                    SDL_RenderDrawPoint(renderer, j * 5, i * 5);
+                }
+            }
+        }
+
+        // command(); /* Command execution */
+
+        SDL_RenderPresent(renderer);
+    }
 }
 
 /*
@@ -297,8 +364,7 @@ playit()
  *	Have player make certain, then exit.
  */
 
-void
-quit(int sig)
+void quit(int sig)
 {
     int oy, ox;
 
@@ -308,29 +374,29 @@ quit(int sig)
      * Reset the signal in case we got here via an interrupt
      */
     if (!q_comm)
-	mpos = 0;
+        mpos = 0;
     getyx(curscr, oy, ox);
     msg("really quit?");
     if (readchar() == 'y')
     {
-	signal(SIGINT, leave);
-	clear();
-	mvprintw(LINES - 2, 0, "You quit with %d gold pieces", purse);
-	move(LINES - 1, 0);
-	refresh();
-	score(purse, 1, 0);
-	my_exit(0);
+        signal(SIGINT, leave);
+        clear();
+        mvprintw(LINES - 2, 0, "You quit with %d gold pieces", purse);
+        move(LINES - 1, 0);
+        refresh();
+        score(purse, 1, 0);
+        my_exit(0);
     }
     else
     {
-	move(0, 0);
-	clrtoeol();
-	status();
-	move(oy, ox);
-	refresh();
-	mpos = 0;
-	count = 0;
-	to_death = FALSE;
+        move(0, 0);
+        clrtoeol();
+        status();
+        move(oy, ox);
+        refresh();
+        mpos = 0;
+        count = 0;
+        to_death = FALSE;
     }
 }
 
@@ -339,19 +405,18 @@ quit(int sig)
  *	Leave quickly, but curteously
  */
 
-void
-leave(int sig)
+void leave(int sig)
 {
     static char buf[BUFSIZ];
 
     NOOP(sig);
 
-    setbuf(stdout, buf);	/* throw away pending output */
+    setbuf(stdout, buf); /* throw away pending output */
 
     if (!isendwin())
     {
-	mvcur(0, COLS - 1, LINES - 1, 0);
-	endwin();
+        mvcur(0, COLS - 1, LINES - 1, 0);
+        endwin();
     }
 
     putchar('\n');
@@ -363,13 +428,12 @@ leave(int sig)
  *	Let them escape for a while
  */
 
-void
-shell()
+void shell()
 {
     /*
      * Set the terminal back to original mode
      */
-    move(LINES-1, 0);
+    move(LINES - 1, 0);
     refresh();
     endwin();
     resetltchars();
@@ -386,7 +450,7 @@ shell()
     fflush(stdout);
     noecho();
     raw();
-    keypad(stdscr,1);
+    keypad(stdscr, 1);
     playltchars();
     in_shell = FALSE;
     wait_for('\n');
@@ -398,11 +462,9 @@ shell()
  *	Leave the process properly
  */
 
-void
-my_exit(int st)
+void my_exit(int st)
 {
     resetltchars();
     md_deinit();
     exit(st);
 }
-

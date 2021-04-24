@@ -29,7 +29,7 @@
 #endif
 
 #define hw (void *)0
-#define win (void *)0
+// #define win (void *)0
 #define WINDOW void
 
 #define MAXINP 30

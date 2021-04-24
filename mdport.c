@@ -823,6 +823,7 @@ md_readchar()
     for(;;)
     {
 	ch = 'a'; // getch();
+    break;
 
 	if (ch == ERR)	    /* timed out waiting for valid sequence */
 	{		    /* flush input so far and start over    */
