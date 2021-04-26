@@ -7,6 +7,7 @@ rogue.html
 rogue.me
 core
 *.o
+*.exe
 rogue
 findpw
 *.scr

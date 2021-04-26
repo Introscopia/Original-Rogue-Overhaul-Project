@@ -5,6 +5,11 @@
         "rogue.h": "c",
         "stdbool.h": "c",
         "extern.h": "c",
-        "assert.h": "c"
+        "assert.h": "c",
+        "sdl.h": "c",
+        "stdio.h": "c",
+        "cstdio": "cpp",
+        "basics.h": "c",
+        "sdl_ttf.h": "c"
     }
 }
