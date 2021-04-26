@@ -303,7 +303,7 @@ int main(int argc, char *argv[]){
 					while( !feof( f ) ){
 						memset(str, 0, 99);
 						fscanf( f, "%s\t%d, %d\t%d x %d\n", str, &x, &y, &w, &h );
-						printf(":>%d: %s %d, %d, %d, %d\n", i, str, x, y, w, h );
+						//printf(":>%d: %s %d, %d, %d, %d\n", i, str, x, y, w, h );
 						//ok_map_put( &font_colors_map, str, i+1 );
 						if( i >= cs ){
 							cs *= 2;
