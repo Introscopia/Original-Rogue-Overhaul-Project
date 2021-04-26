@@ -815,6 +815,7 @@ md_setsuspchar(int c)
 int
 md_readchar()
 {
+    
     int ch = 0;
     int lastch = 0;
     int mode = M_NORMAL;
@@ -822,8 +823,7 @@ md_readchar()
 
     for(;;)
     {
-	ch = 'a'; // getch();
-    break;
+	getch();
 
 	if (ch == ERR)	    /* timed out waiting for valid sequence */
 	{		    /* flush input so far and start over    */

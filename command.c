@@ -21,9 +21,8 @@
  *	Process the user commands
  */
 void
-command()
+command(char ch)
 {
-    register char ch;
     register int ntimes = 1;			/* Number of player moves */
     char *fp;
     THING *mp;
@@ -79,7 +78,7 @@ command()
 		ch = countch;
 	    else
 	    {
-		ch = readchar();
+		// ch = readchar();
 		move_on = FALSE;
 		if (mpos != 0)		/* Erase message if its there */
 		    msg("");
@@ -110,7 +109,7 @@ command()
 		    count = count * 10 + (ch - '0');
 		    if (count > 255)
 			count = 255;
-		    ch = readchar();
+		    // ch = readchar();
 		}
 		countch = ch;
 		/*
@@ -180,7 +179,7 @@ over:
                         endmsg();
 		    }
 		}
-		when '!': shell();
+		// when '!': shell();
 		when 'h': do_move(0, -1);
 		when 'j': do_move(1, 0);
 		when 'k': do_move(-1, 0);
@@ -441,8 +440,8 @@ over:
 	    pick_up(take);
 	if (!running)
 	    door_stop = FALSE;
-	if (!after)
-	    ntimes++;
+	// if (!after)
+	//     ntimes++;
 #ifdef MASTER
         check_inventory(pack);
 #endif

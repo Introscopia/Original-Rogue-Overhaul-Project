@@ -1,0 +1,25 @@
+SPRITES size 16
+WALLS	0, 2	8 x 2
+row	8, 2 FLOOR CORRIDOR STAIRS DOOR TRAP
+row	0, 4 PLAYER GOLD WEAPON ARMOR FOOD SCROLL WAND RING POTION PACK EMPTYSCROLL
+row	0, 5 aquator bat centaur dragon emu venus griffin hobgoblin ice jabberwock kestrel leprechaun medusa
+row	0, 6 nymph orc phantom quagga rattlesnake snake troll black vampire wraith xeroc yeti zombie
+AMULET	0, 7	4 x 1
+LOGO	0, 9	7 x 3
+RIP	6, 12	1 x 3
+GRAVE	9, 9	4 x 4
+GRAVE_ORNAMENTS_1	5, 7	3 x 2
+GRAVE_ORNAMENTS_2	8, 7	2 x 2
+GRAVE_ORNAMENTS_3	10, 7	3 x 2
+
+MAP size 8
+WALLS	0, 0	8 x 2
+row	8, 0 FLOOR CORRIDOR STAIRS DOOR TRAP
+row	0, 2 PLAYER GOLD WEAPON ARMOR FOOD SCROLL WAND RING POTION
+
+FONT size 8
+layout abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:()/.,!?"'*-
+YELLOW	0, 26	26 x 3
+BLUE	0, 29	26 x 3
+WHITE	0, 32	26 x 3
+GRAY	0, 35	26 x 3

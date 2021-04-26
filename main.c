@@ -12,15 +12,59 @@
 #include <string.h>
 #include <signal.h>
 #include <time.h>
-// #include <curses.h>
-#include "rogue.h"
+#include <ctype.h>
 
-#include <SDL2/SDL.h>
+#include "rogue.h"
+#include "basics.h"
+#include "ok_lib.h"
+
+#include "util.h"
+
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
 
 SDL_Window *window;
 SDL_Renderer *renderer;
+TTF_Font *gFont;
+
+char sprite_names[42][12] = {"FLOOR", "CORRIDOR", "STAIRS", "DOOR", "TRAP", "PLAYER", "GOLD", "WEAPON",
+                             "ARMOR", "FOOD", "SCROLL", "WAND", "RING", "POTION", "PACK", "EMPTYSCROLL",
+                             "aquator", "bat", "centaur", "dragon", "emu", "venus", "griffin", "hobgoblin", "ice", "jabberwock", "kestrel", "leprechaun", "medusa",
+                             "nymph", "orc", "phantom", "quagga", "rattlesnake", "snake", "troll", "black", "vampire", "wraith", "xeroc", "yeti", "zombie"};
+
+typedef struct font_data_struct
+{
+    map_int_int charIDs;
+    int pitch, w, h;
+    int offset_x;
+    int *color_offset_y;
+} font_data;
+
+SDL_Rect font_src(font_data *fd, char C, int color)
+{
+    int id = ok_map_get(&(fd->charIDs), C) - 1;
+    return (SDL_Rect){(fd->offset_x + (id % fd->pitch)) * fd->w,
+                      (fd->color_offset_y[color] + (id / fd->pitch)) * fd->h,
+                      fd->w, fd->h};
+}
+
+void display_string(SDL_Renderer *renderer, SDL_Texture *sheet, font_data *fd, char *string, int x, int y, int scale, int color)
+{
+    int len = strlen(string);
+    int w = fd->w * scale;
+    int h = fd->h * scale;
+    for (int i = 0; i < len; ++i)
+    {
+        SDL_Rect src = font_src(fd, string[i], color);
+        if (src.x < 0)
+            continue;
+        SDL_RenderCopy(renderer, sheet, &src, &(SDL_Rect){x + (i * w), y, w, h});
+    }
+}
+
 /*
- * main:
+ * main:e
  *	The main program, of course
  */
 int main(int argc, char **argv)
@@ -30,10 +74,86 @@ int main(int argc, char **argv)
 
     md_init();
 
-    SDL_Init(SDL_INIT_VIDEO); // Initialize SDL2
+    const SDL_Color black = {0, 0, 0, 255};
+    const SDL_Color white = {255, 255, 255, 255};
+//Uint32 rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    rmask = 0xff000000;
+    gmask = 0x00ff0000;
+    bmask = 0x0000ff00;
+    amask = 0x000000ff;
+#else
+    rmask = 0x000000ff;
+    gmask = 0x0000ff00;
+    bmask = 0x00ff0000;
+    amask = 0xff000000;
+#endif
+
+    map_str_int sprite_id_map;
+    ok_map_init_with_capacity(&sprite_id_map, 42);
+    for (int i = 0; i < 42; ++i)
+    {
+        ok_map_put(&sprite_id_map, sprite_names[i], i + 1);
+    }
+
+    //printf(">> %d, %d\n",PLAYER, ok_map_get(&sprite_id_map, "PLAYER")-1 );
+
+    char map_chars[] = ".#%+^@*)]:?/=!";
+    map_int_int char_sprite_map;
+    ok_map_init_with_capacity(&char_sprite_map, 14);
+    for (int i = 0; i < 14; ++i)
+    {
+        ok_map_put(&char_sprite_map, map_chars[i], i + 1);
+    }
+
+    IMG_Init(IMG_INIT_PNG);
+
+    SDL_Texture *sheet = IMG_LoadTexture(renderer, "Assets/loveable_rogue_sheet.png");
+    SDL_Rect wall_srcs[16];
+    SDL_Rect sprite_srcs[42];
+    SDL_Rect map_wall_srcs[16];
+    SDL_Rect map_icon_srcs[14];
+    font_data FD;
+    //map_str_int font_colors_map; for this we would have to save the names of the color blocks too...
+
+    SDL_Rect AMULET_src = (SDL_Rect){0, 0, 0, 0};
+    SDL_Rect LOGO_src = (SDL_Rect){0, 0, 0, 0};
+    SDL_Rect RIP_src = (SDL_Rect){0, 0, 0, 0};
+    SDL_Rect GRAVE_src = (SDL_Rect){0, 0, 0, 0};
+    SDL_Rect GRAVE_ORNAMENTS_srcs[3];
+    for (int i = 0; i < 3; ++i)
+        GRAVE_ORNAMENTS_srcs[i] = (SDL_Rect){0, 0, 0, 0};
+
+    FILE *f = fopen("assets/lovable-rogue-data.txt", "r");
+
+    if (f == NULL)
+    {
+        perror("Can't open lovable");
+        exit(1);
+    }
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        perror("SDL_Init Failed");
+        exit(1);
+    }
+
+    if (TTF_Init() < 0)
+    {
+        perror("TTF_Init Failed");
+        exit(1);
+    }
+
+    gFont = TTF_OpenFont("dos.ttf", 16);
+    if (gFont == NULL)
+    {
+        printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+        exit(1);
+    }
 
     // Create an application window with the following settings:
-    SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
+    SDL_CreateWindowAndRenderer(80 * 9, 24 * 16 + 4 * 16, 0, &window, &renderer);
+    SDL_SetWindowTitle(window, PACKAGE_STRING);
 
     /*
      * FIXME: do better arg processing
@@ -125,7 +245,6 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    init_check(); /* check for legal startup */
     printf("Hello %s %s, just a moment while I dig the dungeon...", (rookie_mode ? "rookie" : "warrior"), whoami);
 #ifdef MASTER
     if (wizard)
@@ -133,7 +252,7 @@ int main(int argc, char **argv)
 #endif
     fflush(stdout);
 
-    md_sleep(1); /* allow enough time to see the message */
+    // md_sleep(1); /* allow enough time to see the message */
 
     initscr();        /* Start up cursor package */
     init_probs();     /* Set up prob tables for objects */
@@ -145,7 +264,7 @@ int main(int argc, char **argv)
      * Must call this after all of the above.
      */
     init_player(); /* Set up initial player stats and objects */
-    setup();
+    // setup();
 
     /*
      * The screen must be at least NUMLINES x NUMCOLS
@@ -223,42 +342,33 @@ int roll(int number, int sides)
     return dtotal;
 }
 
-/*
- * tstp:
- *	Handle stop and start signals
- */
+SDL_Texture *letters[256];
 
-void tstp(int ignored)
+SDL_Texture *surfaceForChar(char c)
 {
-    int y, x;
-    int oy, ox;
+    if (letters[c] != NULL)
+    {
+        return letters[c];
+    }
+    else
+    {
+        SDL_Color color = {255, 255, 255};
 
-    NOOP(ignored);
+        char *pChar = malloc(2 * sizeof(char));
+        pChar[0] = c;
+        pChar[1] = '\0';
 
-    /*
-     * leave nicely
-     */
-    getyx(curscr, oy, ox);
-    mvcur(0, COLS - 1, LINES - 1, 0);
-    endwin();
-    resetltchars();
-    fflush(stdout);
-    md_tstpsignal();
+        //Render text surface
+        SDL_Surface *textSurface = TTF_RenderText_Solid(gFont, pChar, color);
+        //Create texture from surface pixels
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, textSurface);
+        //Get rid of old surface
+        SDL_FreeSurface(textSurface);
+        free(pChar);
 
-    /*
-     * start back up again
-     */
-    md_tstpresume();
-    raw();
-    noecho();
-    keypad(stdscr, 1);
-    playltchars();
-    clearok(curscr, TRUE);
-    wrefresh(curscr);
-    getyx(curscr, y, x);
-    mvcur(y, x, oy, ox);
-    fflush(stdout);
-    wmove(curscr, oy, ox);
+        letters[c] = texture;
+        return texture;
+    }
 }
 
 /*
@@ -270,17 +380,6 @@ void tstp(int ignored)
 void playit()
 {
     char *opts;
-
-    /*
-     * set up defaults for slow terminals
-     */
-
-    if (baudrate() <= 1200)
-    {
-        terse = TRUE;
-        jump = TRUE;
-        see_floor = FALSE;
-    }
 
     if (md_hasclreol())
         inv_type = INV_CLEAR;
@@ -294,6 +393,7 @@ void playit()
     oldpos = hero;
     oldrp = roomin(&hero);
 
+
     SDL_Event event;
 
     while (playing)
@@ -306,16 +406,9 @@ void playit()
                 playing = 0;
                 break;
             case SDL_KEYDOWN:
-                for (int i = 0; i < MAXLINES; i++)
-                {
-                    for (int j = 0; j < MAXCOLS; j++)
-                    {
-                        char p = INDEX(i, j)->p_ch;
+                // command('a'); /* Command execution */
 
-                        printf("%c", p);
-                    }
-                    printf("\n");
-                }
+                command(tolower((char) *SDL_GetKeyName(event.key.keysym.sym)));
                 break;
             case SDL_KEYUP:
                 break;
@@ -335,25 +428,23 @@ void playit()
                 if (INDEX(i, j)->p_flags & F_REAL == 0)
                     continue;
 
-                if (p == '.')
-                {
-                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                    SDL_RenderDrawPoint(renderer, j * 5, i * 5);
-                }
-                else if (p == '#')
-                {
-                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-                    SDL_RenderDrawPoint(renderer, j * 5, i * 5);
-                }
-                else if (p == '-' || p == '|')
-                {
-                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-                    SDL_RenderDrawPoint(renderer, j * 5, i * 5);
-                }
+                SDL_Rect rect;
+                rect.x = j * 9;
+                rect.y = i * 16;
+                rect.w = 9;
+                rect.h = 16;
+
+                SDL_RenderCopy(renderer, surfaceForChar(p), NULL, &rect);
             }
         }
 
-        // command(); /* Command execution */
+        SDL_Rect rect;
+        rect.x = hero.x * 9;
+        rect.y = hero.y * 16;
+        rect.w = 9;
+        rect.h = 16;
+
+        SDL_RenderCopy(renderer, surfaceForChar('@'), NULL, &rect);
 
         SDL_RenderPresent(renderer);
     }
@@ -421,40 +512,6 @@ void leave(int sig)
 
     putchar('\n');
     my_exit(0);
-}
-
-/*
- * shell:
- *	Let them escape for a while
- */
-
-void shell()
-{
-    /*
-     * Set the terminal back to original mode
-     */
-    move(LINES - 1, 0);
-    refresh();
-    endwin();
-    resetltchars();
-    putchar('\n');
-    in_shell = TRUE;
-    after = FALSE;
-    fflush(stdout);
-    /*
-     * Fork and do a shell
-     */
-    md_shellescape();
-
-    printf("\n[Press return to continue]");
-    fflush(stdout);
-    noecho();
-    raw();
-    keypad(stdscr, 1);
-    playltchars();
-    in_shell = FALSE;
-    wait_for('\n');
-    clearok(stdscr, TRUE);
 }
 
 /*

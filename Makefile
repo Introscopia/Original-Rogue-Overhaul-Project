@@ -16,53 +16,56 @@
 # This section could be manually configured if autoconf/configure fails
 ###############################################################################
 
-DISTNAME=@PACKAGE_TARNAME@@PACKAGE_VERSION@
-PACKAGE_TARNAME = @PACKAGE_TARNAME@-@PACKAGE_VERSION@
-PROGRAM=@PROGRAM@
+DISTNAME = rogue5.3-4.4.2020.1
+PACKAGE_TARNAME = rogue-5.3-4.4.2020.1
+PROGRAM = rogue
 
 O=o
 
 #CC=gcc
-CC    = @CC@
+CC = gcc
 
 #CFLAGS=-O2
-CFLAGS= @CFLAGS@ 
+CFLAGS = -g -O2
 
 #LIBS=-lcurses
-LIBS =	@LIBS@
+LIBS = 	-LF:\lib\SDL2-2.0.12\x86_64-w64-mingw32\lib \
+		-LF:\lib\SDL2_ttf-2.0.15\x86_64-w64-mingw32\lib \
+		-LF:\lib\SDL2_image-2.0.5\x86_64-w64-mingw32\lib \
+		-lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
 
 #RM=rm -f
 RM    = rm -f
 
 #GROFF=groff
-GROFF = @GROFF@
+GROFF = groff
 
 #NROFF=nroff
-NROFF = @NROFF@
+NROFF = nroff
 
 #TBL=tbl
-TBL   = @TBL@
+TBL   = tbl
 
 #COLCRT=colcrt
-COLCRT = @COLCRT@
+COLCRT = colcrt
 
 #SED=sed
-SED   = @SED@
+SED   = sed
 
 #SCOREFILE=rogue54.scr
-SCOREFILE = @SCOREFILE@
+SCOREFILE = rogue.scr
 
 #LOCKFILE=rogue54.lck
-LOCKFILE = @LOCKFILE@
+LOCKFILE = rogue.lck
 
 #GROUPOWNER=games
-GROUPOWNER = @GROUPOWNER@
+GROUPOWNER = 
 
 #CPPFLAGS=-DHAVE_CONFIG_H
-CPPFLAGS =@DEFS@ @CPPFLAGS@
+CPPFLAGS =-DHAVE_CONFIG_H 
 
 #DISTFILE = $(PROGRAM)
-DISTFILE = $(DISTNAME)-@TARGET@
+DISTFILE = $(DISTNAME)-x86_64-unknown-linux-gnu
 
 INSTALL=./install-sh
 
@@ -83,13 +86,13 @@ CHMOD=chmod
 
 DESTDIR=
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-datarootdir=@datarootdir@
-datadir=@datadir@
-bindir=@bindir@
-mandir=@mandir@
-docdir=@docdir@
+prefix=/usr/local
+exec_prefix=${prefix}
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+bindir=${exec_prefix}/bin
+mandir=${datarootdir}/man
+docdir=${datarootdir}/doc/${PACKAGE_TARNAME}
 man6dir = $(mandir)/man6
 
 ###############################################################################
@@ -97,8 +100,8 @@ man6dir = $(mandir)/man6
 # It should not be necessary to change anything below this comment
 ############################################################################### 
 
-HDRS     = rogue.h extern.h score.h
-OBJS1    = vers.$(O) extern.$(O) armor.$(O) chase.$(O) command.$(O) \
+HDRS     = rogue.h extern.h score.h basics.h util.h
+OBJS1    = vers.$(O) extern.$(O) armor.$(O) basics.$(O) chase.$(O) command.$(O) \
            daemon.$(O) daemons.$(O) fight.$(O) init.$(O) io.$(O) list.$(O) \
            mach_dep.$(O) main.$(O) mdport.$(O) misc.$(O) monsters.$(O) \
            move.$(O) new_level.$(O)
@@ -106,21 +109,13 @@ OBJS2    = options.$(O) pack.$(O) passages.$(O) potions.$(O) rings.$(O) \
            rip.$(O) rooms.$(O) save.$(O) scrolls.$(O) state.$(O) sticks.$(O) \
            things.$(O) weapons.$(O) wizard.$(O) xcrypt.$(O)
 OBJS     = $(OBJS1) $(OBJS2) dmalloc.$(O)
-CFILES   = vers.c extern.c armor.c chase.c command.c daemon.c \
+CFILES   = vers.c extern.c armor.c basics.c chase.c command.c daemon.c \
            daemons.c fight.c init.c io.c list.c mach_dep.c \
            main.c  mdport.c misc.c monsters.c move.c new_level.c \
            options.c pack.c passages.c potions.c rings.c rip.c \
            rooms.c save.c scrolls.c state.c sticks.c things.c \
            weapons.c wizard.c xcrypt.c \
-	   dmalloc.c
-MISC_C   = findpw.c scedit.c scmisc.c
-DOCSRC   = rogue.me.in rogue.6.in rogue.doc.in rogue.html.in rogue.cat.in
-DOCS     = $(PROGRAM).doc $(PROGRAM).html $(PROGRAM).cat $(PROGRAM).me \
-           $(PROGRAM).6
-AFILES   = configure Makefile.in configure.ac config.h.in config.sub config.guess \
-           install-sh rogue.6.in rogue.me.in rogue.html.in rogue.doc.in rogue.cat.in
-MISC     = Makefile.std LICENSE.TXT rogue54.sln rogue54.vcproj rogue.spec \
-           rogue.png rogue.desktop
+           dmalloc.c
 
 .SUFFIXES: .obj
 
@@ -128,7 +123,11 @@ MISC     = Makefile.std LICENSE.TXT rogue54.sln rogue54.vcproj rogue.spec \
 	$(CC) $(CFLAGS) $(CPPFLAGS) /c $*.c
     
 .c.o:
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $*.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) \
+	-IF:\lib\SDL2-2.0.12\x86_64-w64-mingw32\include\SDL2 \
+	-IF:\lib\SDL2_ttf-2.0.15\x86_64-w64-mingw32\include\SDL2 \
+	-IF:\lib\SDL2_image-2.0.5\x86_64-w64-mingw32\include\SDL2 \
+	-c $*.c
     
 $(PROGRAM): $(HDRS) $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
@@ -137,24 +136,9 @@ clean:
 	$(RM) $(OBJS1)
 	$(RM) $(OBJS2)
 	$(RM) core a.exe a.out a.exe.stackdump $(PROGRAM) $(PROGRAM).exe
-	$(RM) $(PROGRAM).tar $(PROGRAM).tar.gz $(PROGRAM).zip 
+	$(RM) $(PROGRAM).tar $(PROGRAM).tar.gz $(PROGRAM).zip
 	$(RM) *.log *.out
 	$(RM) -rf $(DISTNAME)
-
-maintainer-clean: clean
-	$(RM) config.h
-	$(RM) Makefile
-	$(RM) config.status
-	$(RM) -rf autom4te.cache
-	$(RM) config.log
-	$(RM) $(PROGRAM).scr $(PROGRAM).lck
-
-stddocs:
-	sed -e 's/@PROGRAM@/rogue/' -e 's/@SCOREFILE@/rogue.scr/' rogue.6.in > rogue.6
-	sed -e 's/@PROGRAM@/rogue/' -e 's/@SCOREFILE@/rogue.scr/' rogue.me.in > rogue.me
-	sed -e 's/@PROGRAM@/rogue/' -e 's/@SCOREFILE@/rogue.scr/' rogue.html.in > rogue,html
-	sed -e 's/@PROGRAM@/rogue/' -e 's/@SCOREFILE@/rogue.scr/' rogue.doc.in > rogue.doc
-	sed -e 's/@PROGRAM@/rogue/' -e 's/@SCOREFILE@/rogue.scr/' rogue.cat.in > rogue.cat
 
 dist.src:
 	$(MAKE) $(MAKEFILE) clean
@@ -163,29 +147,6 @@ dist.src:
 	tar cf $(DISTNAME)-src.tar $(DISTNAME)
 	gzip -f $(DISTNAME)-src.tar
 	rm -fr $(DISTNAME)
-
-findpw: findpw.c xcrypt.o
-	$(CC) -s -o findpw findpw.c xcrypt.o
-
-scedit: scedit.o scmisc.o vers.o mdport.o xcrypt.o
-	$(CC) -s -o scedit vers.o scedit.o scmisc.o mdport.o xcrypt.o -lcurses
-
-scmisc.o scedit.o:
-	$(CC) -O -c $(SF) $*.c
-
-$(PROGRAM).doc: rogue.me
-	if test "x$(GROFF)" != "x" -a "x$(SED)" != "x" ; then \
-	$(GROFF) -P-c -t -me -Tascii rogue.me | $(SED) -e 's/.\x08//g' > $(PROGRAM).doc ;\
-	elif test "x$(NROFF)" != "x" -a "x$(TBL)" != "x" -a "x$(COLCRT)" != "x" ; then \
-        tbl rogue.me | $(NROFF) -me | colcrt - > $(PROGRAM).doc ;\
-	fi
-
-$(PROGRAM).cat: rogue.6
-	if test "x$(GROFF)" != "x" -a "x$(SED)" != "x" ; then \
-	$(GROFF) -Tascii -man rogue.6 | $(SED) -e 's/.\x08//g' > $(PROGRAM).cat ;\
-	elif test "x$(NROFF)" != "x" -a "x$(TBL)" != "x" -a "x$(COLCRT)" != "x" ; then \
-	$(NROFF) -man rogue.6 | $(COLCRT) - > $(PROGRAM).cat ;\
-	fi
 
 dist: clean $(PROGRAM)
 	tar cf $(DISTFILE).tar $(PROGRAM) LICENSE.TXT $(DOCS)

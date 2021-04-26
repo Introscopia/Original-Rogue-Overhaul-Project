@@ -73,32 +73,6 @@ void chmsg(char *fmt, int arg);
 #endif /* CHECKTIME */
 
 /*
- * init_check:
- *	Check out too see if it is proper to play the game now
- */
-
-void
-init_check()
-{
-#if defined(MAXLOAD) || defined(MAXUSERS)
-    if (too_much())
-    {
-	printf("Sorry, %s, but the system is too loaded now.\n", whoami);
-	printf("Try again later.  Meanwhile, why not enjoy a%s %s?\n",
-	    vowelstr(fruit), fruit);
-	if (author()) {
-	    printf("However, since you're a good guy, it's up to you\n");
-            fflush(stdout);
-            sleep(2);
-	} else {
-            fflush(stdout);
-	    exit(1);
-        }
-    }
-#endif
-}
-
-/*
  * open_score:
  *	Open up the score file for future use
  */
@@ -143,19 +117,11 @@ open_score()
 void
 setup()
 {
-#ifdef CHECKTIME
-    int  checkout();
-#endif
 
 #ifdef DUMP
     md_onsignal_autosave();
 #else
     md_onsignal_default();
-#endif
-
-#ifdef CHECKTIME
-    md_start_checkout_timer(CHECKTIME*60);
-    num_checks = 0;
 #endif
 
     raw();				/* Raw mode */

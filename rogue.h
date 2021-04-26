@@ -677,7 +677,7 @@ int	center(char *str);
 void	chg_str(int amt);
 void	check_level();
 void	conn(int r1, int r2);
-void	command();
+void	command(char);
 void	create_obj();
 int     pick_mons();
 
