@@ -14,68 +14,64 @@ DISTNAME = rogue5.3-4.4.2020.1
 PACKAGE_TARNAME = rogue-5.3-4.4.2020.1
 PROGRAM = rogue
 
-SRC=src
+BIN:=bin
+SRC:=src
+OBJ:=obj
 
 #CC=gcc
-CC = gcc
+CC := gcc
 
 #CFLAGS=-O2
-CFLAGS = -g -O2
+CFLAGS := -g -O2
 
-INCLUDES = 	-IF:\lib\SDL2-2.0.12\x86_64-w64-mingw32\include\SDL2 \
+INCLUDES := -IF:\lib\SDL2-2.0.12\x86_64-w64-mingw32\include\SDL2 \
 			-IF:\lib\SDL2_ttf-2.0.15\x86_64-w64-mingw32\include\SDL2 \
 			-IF:\lib\SDL2_image-2.0.5\x86_64-w64-mingw32\include\SDL2 \
 
-LIBS = 	-LF:\lib\SDL2-2.0.12\x86_64-w64-mingw32\lib \
+LIBS := -LF:\lib\SDL2-2.0.12\x86_64-w64-mingw32\lib \
 		-LF:\lib\SDL2_ttf-2.0.15\x86_64-w64-mingw32\lib \
 		-LF:\lib\SDL2_image-2.0.5\x86_64-w64-mingw32\lib \
 		-lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
 
-#RM=rm -f
-RM    = rm -f
+ifeq ($(OS),Windows_NT)
+	RM := del
+	RMDIR := rmdir /s /q
+	CP := copy
+else
+	RM := rm -f
+	RMDIR := rm -rf
+endif
 
-#SED=sed
-SED   = sed
-
-#SCOREFILE=rogue54.scr
 SCOREFILE = rogue.scr
 
-#LOCKFILE=rogue54.lck
 LOCKFILE = rogue.lck
 
-#GROUPOWNER=games
-# GROUPOWNER = 
-
-#CPPFLAGS=-DHAVE_CONFIG_H
-# CPPFLAGS =-DHAVE_CONFIG_H 
-
-#DISTFILE = $(PROGRAM)
 DISTFILE = $(DISTNAME)-x86_64-unknown-linux-gnu
 
 INSTALL=./install-sh
 
 MKDIR=mkdir
 
-RMDIR=rmdir
-
 DESTDIR=
 
-CFILES 	= $(wildcard $(SRC)/*.c)
-HDRS	= $(wildcard $(SRC)/*.h)
-OBJS	= $(patsubst %.c,%.o,$(CFILES))
+CFILES 	:= $(wildcard $(SRC)/*.c)
+HDRS	:= $(wildcard $(SRC)/*.h)
+OBJS	:= $(subst  $(SRC),$(OBJ),$(patsubst %.c,%.o,$(CFILES)))
 
-$(SRC)/%.o: $(SRC)/%.c
-	@echo $*.c
+
+$(OBJ)/%.o: $(SRC)/%.c $(OBJ)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INCLUDES) -c $(SRC)/$*.c -o $@
 
-$(info $(HDRS) $(OBJS))
-
 $(PROGRAM): $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $(BIN)/$@
+
+$(OBJ):
+	$(MKDIR) $(OBJ)
 
 clean:
-	$(RM) *.o $(SRC)/*.o
-	$(RM) -rf $(DISTNAME)
+	$(RMDIR) $(OBJ)
+	$(RM) $(PROGRAM)
+	$(RM) *.exe
 
 dist.src:
 	$(MAKE) $(MAKEFILE) clean

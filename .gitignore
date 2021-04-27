@@ -12,3 +12,7 @@ rogue
 findpw
 *.scr
 *.log
+obj/
+
+bin/rogue
+bin/rogue.exe
