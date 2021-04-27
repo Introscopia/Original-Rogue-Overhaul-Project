@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include "extern.h"
 #include "dmalloc.h"
 

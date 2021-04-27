@@ -354,14 +354,26 @@ bool fseek_string( FILE *f, char *str ){
 
 bool empty_line( FILE *f ){
 	char c = getc( f );
-	if( c == '\n' ){
-		c = getc( f );
-		if( c == '\n' ){
-			return 1;
-		}
+	if( c != '\r' ){
+		ungetc( c, f );
+		return 0;
 	}
-	ungetc( c, f );
-	return 0;
+	c = getc( f );
+	if( c != '\n' ){
+		ungetc( c, f ); ungetc( '\r', f ); 
+		return 0;
+	}
+	c = getc( f );
+	if( c != '\r' ){
+		ungetc( c, f ); ungetc( '\n', f ); ungetc( '\r', f ); 
+		return 0;
+	}
+	c = getc( f );
+	if( c != '\n' ){
+		ungetc( c, f ); ungetc( '\r', f ); ungetc( '\n', f ); ungetc( '\r', f ); 
+		return 0;
+	}
+	return 1;
 }
 
 
