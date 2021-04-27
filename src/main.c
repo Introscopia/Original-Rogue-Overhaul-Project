@@ -110,9 +110,28 @@ int main(int argc, char **argv)
         ok_map_put(&char_sprite_map, map_chars[i], i + 1);
     }
 
-    IMG_Init(IMG_INIT_PNG);
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        printf("SDL_Init Failed\n");
+        exit(1);
+    }
 
-    sheet = IMG_LoadTexture(renderer, "assets/loveable_rogue_sheet.png");
+    if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG)
+    {
+        printf("IMG_Init Failed\n");
+        exit(1);
+    }
+
+    if (TTF_Init() < 0)
+    {
+        printf("TTF_Init Failed\n");
+        exit(1);
+    }
+
+    SDL_CreateWindowAndRenderer(60 * 32, 24 * 32, 0, &window, &renderer);
+    SDL_SetWindowTitle(window, PACKAGE_STRING);
+
+    sheet = IMG_LoadTexture(renderer, "./assets/loveable_rogue_sheet.png");
 
     if (sheet == NULL)
     {
@@ -345,28 +364,12 @@ out:
 
     fclose(f);
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        perror("SDL_Init Failed");
-        exit(1);
-    }
-
-    if (TTF_Init() < 0)
-    {
-        perror("TTF_Init Failed");
-        exit(1);
-    }
-
-    gFont = TTF_OpenFont("dos.ttf", 16);
-    if (gFont == NULL)
-    {
-        printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
-        exit(1);
-    }
-
-    // Create an application window with the following settings:
-    SDL_CreateWindowAndRenderer(80 * 9, 24 * 16 + 4 * 16, 0, &window, &renderer);
-    SDL_SetWindowTitle(window, PACKAGE_STRING);
+    // gFont = TTF_OpenFont("dos.ttf", 16);
+    // if (gFont == NULL)
+    // {
+    //     printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+    //     exit(1);
+    // }
 
     /*
      * FIXME: do better arg processing
@@ -631,31 +634,31 @@ void playit()
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-        for (int i = 0; i < MAXLINES; i++)
+        for (int j = 0; j < MAXLINES; j++)
         {
-            for (int j = 0; j < MAXCOLS; j++)
+            for (int i = 0; i < MAXCOLS; i++)
             {
-                char p = INDEX(i, j)->p_ch;
+                char p = INDEX(j, i)->p_ch;
 
                 if (p == ' ')
                     continue;
                 if (p == '-' || p == '|')
                 {
-                    // int neighborhood = 0;
-                    // if (places[p - MAXCOLS].p_ch == '-' || places[p - MAXCOLS].p_ch == '|')
-                    //     neighborhood = 1;
-                    // if (places[p + 1].p_ch == '-' || places[p + 1].p_ch == '|')
-                    //     neighborhood |= 2;
-                    // if (places[p + MAXCOLS].p_ch == '-' || places[p + MAXCOLS].p_ch == '|')
-                    //     neighborhood |= 4;
-                    // if (places[p - 1].p_ch == '-' || places[p - 1].p_ch == '|')
-                    //     neighborhood |= 8;
-                    SDL_RenderCopy(renderer, sheet, wall_srcs, &(SDL_Rect){i * 32, j * 32, 32, 32});
+                    int neighborhood = 0;
+                    if (INDEX(j - 1, i)->p_ch == '-' || INDEX(j - 1, i)->p_ch == '|')
+                        neighborhood = 1;
+                    if (INDEX(j, i + 1)->p_ch == '-' || INDEX(j, i + 1)->p_ch == '|')
+                        neighborhood |= 2;
+                    if (INDEX(j + 1, i)->p_ch == '-' || INDEX(j + 1, i)->p_ch == '|')
+                        neighborhood |= 4;
+                    if (INDEX(j, i - 1)->p_ch == '-' || INDEX(j, i - 1)->p_ch == '|')
+                        neighborhood |= 8;
+                    SDL_RenderCopy(renderer, sheet, wall_srcs + neighborhood, &(SDL_Rect){i * 32, j * 32, 32, 32});
                 }
                 else
                 {
-                    int id = ok_map_get(&char_sprite_map, places[p].p_ch) - 1;
-                    SDL_RenderCopy(renderer, sheet, sprite_srcs + id, &(SDL_Rect){i * 32, j * 32, 32, 32});
+                    int id = ok_map_get(&char_sprite_map, p) - 1;
+                    //SDL_RenderCopy(renderer, sheet, sprite_srcs + id, &(SDL_Rect){i * 32, j * 32, 32, 32});
                 }
             }
         }
@@ -665,8 +668,6 @@ void playit()
         rect.y = hero.y * 16;
         rect.w = 9;
         rect.h = 16;
-
-        SDL_RenderCopy(renderer, surfaceForChar('@'), NULL, &rect);
 
         SDL_RenderPresent(renderer);
     }
