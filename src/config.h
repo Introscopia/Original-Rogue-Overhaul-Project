@@ -11,52 +11,52 @@
 /* #undef GROUPOWNER */
 
 /* Define to 1 if you have the `alarm' function. */
-#define HAVE_ALARM 1
+// #define HAVE_ALARM 1
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
-#define HAVE_ARPA_INET_H 1
+// #define HAVE_ARPA_INET_H 1
 
 /* Define to 1 if libcurses is requested */
-#define HAVE_CURSES_H 1
+// #define HAVE_CURSES_H 1
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 /* #undef HAVE_DOPRNT */
 
 /* Define to 1 if you have the `erasechar' function. */
-#define HAVE_ERASECHAR 1
+// #define HAVE_ERASECHAR 1
 
 /* Define if ncurses has ESCDELAY variable */
-#define HAVE_ESCDELAY 1
+// #define HAVE_ESCDELAY 1
 
 /* Define to 1 if you have the <fcntl.h> header file. */
-#define HAVE_FCNTL_H 1
+// #define HAVE_FCNTL_H 1
 
 /* Define to 1 if you have the `fork' function. */
-#define HAVE_FORK 1
+// #define HAVE_FORK 1
 
 /* Define to 1 if you have the `getgid' function. */
-#define HAVE_GETGID 1
+// #define HAVE_GETGID 1
 
 /* Define to 1 if you have the `getloadavg' function. */
-#define HAVE_GETLOADAVG 1
+// #define HAVE_GETLOADAVG 1
 
 /* Define to 1 if you have the `getpass' function. */
-#define HAVE_GETPASS 1
+// #define HAVE_GETPASS 1
 
 /* Define to 1 if you have the `getpwuid' function. */
-#define HAVE_GETPWUID 1
+// #define HAVE_GETPWUID 1
 
 /* Define to 1 if you have the `getuid' function. */
-#define HAVE_GETUID 1
+// #define HAVE_GETUID 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+// #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `killchar' function. */
-#define HAVE_KILLCHAR 1
+// #define HAVE_KILLCHAR 1
 
 /* Define to 1 if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
+// #define HAVE_LIMITS_H 1
 
 /* Define to 1 if you have the `loadav' function. */
 /* #undef HAVE_LOADAV */
@@ -66,10 +66,10 @@
 /* #undef HAVE_LSTAT_EMPTY_STRING_BUG */
 
 /* Define to 1 if you have the <memory.h> header file. */
-#define HAVE_MEMORY_H 1
+// #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `memset' function. */
-#define HAVE_MEMSET 1
+// #define HAVE_MEMSET 1
 
 /* Define to 1 if libncurses is requested */
 /* #undef HAVE_NCURSES_H */
@@ -87,28 +87,28 @@
 /* #undef HAVE_PROCESS_H */
 
 /* Define to 1 if you have the <pwd.h> header file. */
-#define HAVE_PWD_H 1
+// #define HAVE_PWD_H 1
 
 /* Define to 1 if you have the `setenv' function. */
-#define HAVE_SETENV 1
+// #define HAVE_SETENV 1
 
 /* Define to 1 if you have the `setgid' function. */
-#define HAVE_SETGID 1
+// #define HAVE_SETGID 1
 
 /* Define to 1 if you have the `setregid' function. */
-#define HAVE_SETREGID 1
+// #define HAVE_SETREGID 1
 
 /* Define to 1 if you have the `setresgid' function. */
-#define HAVE_SETRESGID 1
+// #define HAVE_SETRESGID 1
 
 /* Define to 1 if you have the `setresuid' function. */
-#define HAVE_SETRESUID 1
+// #define HAVE_SETRESUID 1
 
 /* Define to 1 if you have the `setreuid' function. */
-#define HAVE_SETREUID 1
+// #define HAVE_SETREUID 1
 
 /* Define to 1 if you have the `setuid' function. */
-#define HAVE_SETUID 1
+// #define HAVE_SETUID 1
 
 /* Define to 1 if you have the `spawnl' function. */
 /* #undef HAVE_SPAWNL */
@@ -118,41 +118,41 @@
 /* #undef HAVE_STAT_EMPTY_STRING_BUG */
 
 /* Define to 1 if stdbool.h conforms to C99. */
-#define HAVE_STDBOOL_H 1
+// #define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H 1
+// #define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-#define HAVE_STDLIB_H 1
+// #define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `strchr' function. */
-#define HAVE_STRCHR 1
+// #define HAVE_STRCHR 1
 
 /* Define to 1 if you have the `strerror' function. */
-#define HAVE_STRERROR 1
+// #define HAVE_STRERROR 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-#define HAVE_STRINGS_H 1
+// #define HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
-#define HAVE_STRING_H 1
+// #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
+// #define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the <utmp.h> header file. */
-#define HAVE_UTMP_H 1
+// #define HAVE_UTMP_H 1
 
 
 /* Define to 1 if you have the <vfork.h> header file. */
 /* #undef HAVE_VFORK_H */
 
 /* Define to 1 if you have the `vprintf' function. */
-#define HAVE_VPRINTF 1
+// #define HAVE_VPRINTF 1
 
 /* Define to 1 if the system has the type `_Bool'. */
-#define HAVE__BOOL 1
+// #define HAVE__BOOL 1
 
 /* Define to 1 if you have the `_spawnl' function. */
 /* #undef HAVE__SPAWNL */

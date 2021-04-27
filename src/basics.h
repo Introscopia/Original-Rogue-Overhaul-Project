@@ -14,7 +14,7 @@
 #include <errno.h>
 #include <locale.h>
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 
 #define PHI         (double) 1.618033988749894848204586834365638117720309179805762862135

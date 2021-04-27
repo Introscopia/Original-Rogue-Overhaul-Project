@@ -10,6 +10,8 @@
         "stdio.h": "c",
         "cstdio": "cpp",
         "basics.h": "c",
-        "sdl_ttf.h": "c"
+        "sdl_ttf.h": "c",
+        "util.h": "c",
+        "sdl_image.h": "c"
     }
 }

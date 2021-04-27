@@ -14,10 +14,10 @@
 #include <time.h>
 #include <ctype.h>
 
+#include "config.h"
 #include "rogue.h"
 #include "basics.h"
 #include "ok_lib.h"
-
 #include "util.h"
 
 #include <SDL.h>
@@ -63,6 +63,13 @@ void display_string(SDL_Renderer *renderer, SDL_Texture *sheet, font_data *fd, c
     }
 }
 
+SDL_Texture *sheet;
+SDL_Rect wall_srcs[16];
+SDL_Rect sprite_srcs[42];
+SDL_Rect map_wall_srcs[16];
+SDL_Rect map_icon_srcs[14];
+map_int_int char_sprite_map;
+
 /*
  * main:e
  *	The main program, of course
@@ -96,10 +103,7 @@ int main(int argc, char **argv)
         ok_map_put(&sprite_id_map, sprite_names[i], i + 1);
     }
 
-    //printf(">> %d, %d\n",PLAYER, ok_map_get(&sprite_id_map, "PLAYER")-1 );
-
     char map_chars[] = ".#%+^@*)]:?/=!";
-    map_int_int char_sprite_map;
     ok_map_init_with_capacity(&char_sprite_map, 14);
     for (int i = 0; i < 14; ++i)
     {
@@ -108,11 +112,14 @@ int main(int argc, char **argv)
 
     IMG_Init(IMG_INIT_PNG);
 
-    SDL_Texture *sheet = IMG_LoadTexture(renderer, "Assets/loveable_rogue_sheet.png");
-    SDL_Rect wall_srcs[16];
-    SDL_Rect sprite_srcs[42];
-    SDL_Rect map_wall_srcs[16];
-    SDL_Rect map_icon_srcs[14];
+    sheet = IMG_LoadTexture(renderer, "assets/loveable_rogue_sheet.png");
+
+    if (sheet == NULL)
+    {
+        printf("Can't open sprite sheet\n");
+        exit(1);
+    }
+
     font_data FD;
     //map_str_int font_colors_map; for this we would have to save the names of the color blocks too...
 
@@ -124,13 +131,219 @@ int main(int argc, char **argv)
     for (int i = 0; i < 3; ++i)
         GRAVE_ORNAMENTS_srcs[i] = (SDL_Rect){0, 0, 0, 0};
 
-    FILE *f = fopen("assets/lovable-rogue-data.txt", "r");
+    FILE *f = fopen("assets/loveable-rogue-data.txt", "r");
 
     if (f == NULL)
     {
-        perror("Can't open lovable");
+        printf("Can't open sprite sheet metadata\n");
         exit(1);
     }
+
+    char mode = 0;
+    int size = 0;
+    char str[100];
+    int x, y, w, h;
+    char c;
+
+    map_str_int labels;
+    ok_map_init(&labels);
+    ok_map_put(&labels, "row", 1);
+    ok_map_put(&labels, "WALLS", 2);
+    ok_map_put(&labels, "AMULET", 3);
+    ok_map_put(&labels, "LOGO", 4);
+    ok_map_put(&labels, "RIP", 5);
+    ok_map_put(&labels, "GRAVE", 6);
+    ok_map_put(&labels, "GRAVE_ORNAMENTS_1", 7);
+    ok_map_put(&labels, "GRAVE_ORNAMENTS_2", 8);
+    ok_map_put(&labels, "GRAVE_ORNAMENTS_3", 9);
+
+    while (!feof(f))
+    {
+
+        switch (mode)
+        {
+        case 0:
+            fscanf(f, "%s size %d", str, &size);
+            mode = str[0];
+            //printf("#%s, %d\n", str, size );
+            getc(f);
+            break;
+        case 'S':
+            if (empty_line(f))
+            {
+                mode = 0;
+                break;
+            }
+
+            fscanf(f, "%s	%d, %d", str, &x, &y);
+            //printf("S %s %d, %d\n", str, x, y );
+            int L = ok_map_get(&labels, str);
+            switch (L)
+            {
+            case 1: //row
+            {
+                int R = 0; //row index
+                int i = 0;
+                memset(str, 0, 99);
+                getc(f);
+                c = getc(f);
+                while (c != EOF)
+                {
+                    if (c == ' ' || c == '\n')
+                    {
+                        int id = ok_map_get(&sprite_id_map, str) - 1;
+                        //printf("\tr %s (%d), y= %d\n", str, id, y );
+                        sprite_srcs[id] = (SDL_Rect){(x + R) * size, y * size, size, size};
+                        R++;
+                        if (c == '\n')
+                            break;
+                        i = 0;
+                        memset(str, 0, 99);
+                    }
+                    else
+                    {
+                        str[i++] = c;
+                    }
+                    c = getc(f);
+                }
+            }
+            break;
+            case 2: //walls
+            {
+                fscanf(f, "%d x %d\n", &w, &h);
+                //printf("\tW %d, %d, %d, %d\n", x, y, w, h );
+                for (int i = 0; i < 16; ++i)
+                {
+                    wall_srcs[i] = (SDL_Rect){(x + (i % w)) * size, (y + (i / w)) * size, size, size};
+                    //printf("%d, %d, %d, %d\n", wall_srcs[i].x, wall_srcs[i].y, wall_srcs[i].w, wall_srcs[i].h );
+                }
+            }
+            break;
+            case 3: //amulet
+                fscanf(f, "%d x %d", &w, &h);
+                AMULET_src = (SDL_Rect){x, y, w, h};
+                break;
+            case 4: //logo
+                fscanf(f, "%d x %d", &w, &h);
+                LOGO_src = (SDL_Rect){x, y, w, h};
+                break;
+            case 5: //RIP
+                fscanf(f, "%d x %d", &w, &h);
+                RIP_src = (SDL_Rect){x, y, w, h};
+                break;
+            case 6: //Grave
+                fscanf(f, "%d x %d", &w, &h);
+                GRAVE_src = (SDL_Rect){x, y, w, h};
+                break;
+            case 7: //GRAVE_ORNAMENTS_1
+                fscanf(f, "%d x %d", &w, &h);
+                GRAVE_ORNAMENTS_srcs[0] = (SDL_Rect){x, y, w, h};
+                break;
+            case 8: //GRAVE_ORNAMENTS_2
+                fscanf(f, "%d x %d", &w, &h);
+                GRAVE_ORNAMENTS_srcs[1] = (SDL_Rect){x, y, w, h};
+                break;
+            case 9: //GRAVE_ORNAMENTS_3
+                fscanf(f, "%d x %d", &w, &h);
+                GRAVE_ORNAMENTS_srcs[2] = (SDL_Rect){x, y, w, h};
+                break;
+            }
+            break;
+        case 'M':
+            if (empty_line(f))
+            {
+                mode = 0;
+                break;
+            }
+
+            fscanf(f, "%s	%d, %d", str, &x, &y);
+            //printf("M %s %d, %d\n", str, x, y );
+            L = ok_map_get(&labels, str);
+            switch (L)
+            {
+            case 1: //map row
+            {
+                int R = 0; //row index
+                int i = 0;
+                memset(str, 0, 99);
+                getc(f);
+                c = getc(f);
+                while (c != EOF)
+                {
+                    if (c == ' ' || c == '\n')
+                    {
+                        int id = ok_map_get(&sprite_id_map, str) - 1;
+                        //printf("\tr %s (%d), y= %d\n", str, id, y );
+                        map_icon_srcs[id] = (SDL_Rect){(x + R) * size, y * size, size, size};
+                        R++;
+                        if (c == '\n')
+                        {
+                            ungetc(c, f);
+                            break;
+                        }
+                        i = 0;
+                        memset(str, 0, 99);
+                    }
+                    else
+                    {
+                        str[i++] = c;
+                    }
+                    c = getc(f);
+                }
+            }
+            break;
+            case 2: //map walls
+            {
+                fscanf(f, "%d x %d", &w, &h);
+                //printf("\tW %d, %d, %d, %d\n", x, y, w, h );
+                for (int i = 0; i < 16; ++i)
+                {
+                    map_wall_srcs[i] = (SDL_Rect){(x + (i % w)) * size, (y + (i / w)) * size, size, size};
+                    //printf("\t%d, %d, %d, %d\n", map_wall_srcs[i].x, map_wall_srcs[i].y, map_wall_srcs[i].w, map_wall_srcs[i].h );
+                }
+            }
+            break;
+            }
+            break;
+        case 'F':
+            memset(str, 0, 99);
+            fscanf(f, "layout %s", str);
+            int len = strlen(str);
+            ok_map_init_with_capacity(&(FD.charIDs), len);
+            for (int i = 0; i < len; ++i)
+            {
+                ok_map_put(&(FD.charIDs), str[i], i + 1);
+            }
+            int i = 0;
+            int cs = 2;
+            FD.color_offset_y = malloc(cs * sizeof(int));
+            //ok_map_init( &font_colors_map );
+            while (!feof(f))
+            {
+                memset(str, 0, 99);
+                fscanf(f, "%s\t%d, %d\t%d x %d\n", str, &x, &y, &w, &h);
+                //printf(":>%d: %s %d, %d, %d, %d\n", i, str, x, y, w, h );
+                //ok_map_put( &font_colors_map, str, i+1 );
+                if (i >= cs)
+                {
+                    cs *= 2;
+                    FD.color_offset_y = realloc(FD.color_offset_y, cs * sizeof(int));
+                }
+                FD.color_offset_y[i++] = y;
+                //printf("(%d)\n", FD.color_offset_y[i-1] );
+                FD.offset_x = x;
+                FD.pitch = w;
+            }
+            FD.w = size;
+            FD.h = size;
+            goto out;
+            break;
+        }
+    }
+    ok_map_deinit(&labels);
+out:
+
+    fclose(f);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -393,7 +606,6 @@ void playit()
     oldpos = hero;
     oldrp = roomin(&hero);
 
-
     SDL_Event event;
 
     while (playing)
@@ -408,7 +620,7 @@ void playit()
             case SDL_KEYDOWN:
                 // command('a'); /* Command execution */
 
-                command(tolower((char) *SDL_GetKeyName(event.key.keysym.sym)));
+                command(tolower((char)*SDL_GetKeyName(event.key.keysym.sym)));
                 break;
             case SDL_KEYUP:
                 break;
@@ -425,16 +637,26 @@ void playit()
             {
                 char p = INDEX(i, j)->p_ch;
 
-                if (INDEX(i, j)->p_flags & F_REAL == 0)
+                if (p == ' ')
                     continue;
-
-                SDL_Rect rect;
-                rect.x = j * 9;
-                rect.y = i * 16;
-                rect.w = 9;
-                rect.h = 16;
-
-                SDL_RenderCopy(renderer, surfaceForChar(p), NULL, &rect);
+                if (p == '-' || p == '|')
+                {
+                    // int neighborhood = 0;
+                    // if (places[p - MAXCOLS].p_ch == '-' || places[p - MAXCOLS].p_ch == '|')
+                    //     neighborhood = 1;
+                    // if (places[p + 1].p_ch == '-' || places[p + 1].p_ch == '|')
+                    //     neighborhood |= 2;
+                    // if (places[p + MAXCOLS].p_ch == '-' || places[p + MAXCOLS].p_ch == '|')
+                    //     neighborhood |= 4;
+                    // if (places[p - 1].p_ch == '-' || places[p - 1].p_ch == '|')
+                    //     neighborhood |= 8;
+                    SDL_RenderCopy(renderer, sheet, wall_srcs, &(SDL_Rect){i * 32, j * 32, 32, 32});
+                }
+                else
+                {
+                    int id = ok_map_get(&char_sprite_map, places[p].p_ch) - 1;
+                    SDL_RenderCopy(renderer, sheet, sprite_srcs + id, &(SDL_Rect){i * 32, j * 32, 32, 32});
+                }
             }
         }
 
