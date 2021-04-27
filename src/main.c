@@ -162,7 +162,7 @@ void load_spritesheet_metadata( char *filename ){
                     case 2://walls
                         {
                             fscanf( f, "%d x %d", &w, &h );
-                            printf("\tW %d, %d, %d, %d\n", x, y, w, h );
+                            //printf("\tW %d, %d, %d, %d\n", x, y, w, h );
                             for (int i = 0; i < 16; ++i){
                                 wall_srcs[i] = (SDL_Rect){ (x+(i%w))*size, (y+(i/w))*size, size, size };
                                 //printf("%d, %d, %d, %d\n", wall_srcs[i].x, wall_srcs[i].y, wall_srcs[i].w, wall_srcs[i].h );
@@ -660,11 +660,9 @@ void playit()
             }
         }
 
-        SDL_Rect rect;
-        rect.x = hero.x * 9;
-        rect.y = hero.y * 16;
-        rect.w = 9;
-        rect.h = 16;
+        SDL_Rect pdst = (SDL_Rect){ hero.x * TILE_WIDTH, hero.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
+        SDL_RenderCopy(renderer, sheet, sprite_srcs + ok_map_get(&sprite_id_map, "PLAYER")-1, &pdst );
+        
 
         SDL_RenderPresent(renderer);
     }
