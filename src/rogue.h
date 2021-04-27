@@ -745,7 +745,7 @@ void	setup();
 void	shell();
 bool	show_floor();
 void	show_map();
-void	show_win(char *message);
+//void	show_win(char *message);
 int	sign(int nm);
 int	spread(int nm);
 void	start_daemon(void (*func)(), int arg, int type);

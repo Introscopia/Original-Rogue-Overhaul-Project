@@ -281,6 +281,7 @@ void fatal(char *fmt, ...)
  * show_win:
  *	Function used to display a window and wait before returning
  */
+/*
 void show_win(char *message)
 {
     // WINDOW *win;
@@ -295,3 +296,4 @@ void show_win(char *message)
     clearok(curscr, TRUE);
     touchwin(stdscr);
 }
+*/

@@ -25,22 +25,19 @@
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
+//these are now extern from i_curses
 SDL_Window *window;
 SDL_Renderer *renderer;
 TTF_Font *gFont;
+
+
 
 char sprite_names[42][12] = {"FLOOR", "CORRIDOR", "STAIRS", "DOOR", "TRAP", "PLAYER", "GOLD", "WEAPON",
                              "ARMOR", "FOOD", "SCROLL", "WAND", "RING", "POTION", "PACK", "EMPTYSCROLL",
                              "aquator", "bat", "centaur", "dragon", "emu", "venus", "griffin", "hobgoblin", "ice", "jabberwock", "kestrel", "leprechaun", "medusa",
                              "nymph", "orc", "phantom", "quagga", "rattlesnake", "snake", "troll", "black", "vampire", "wraith", "xeroc", "yeti", "zombie"};
 
-typedef struct font_data_struct
-{
-    map_int_int charIDs;
-    int pitch, w, h;
-    int offset_x;
-    int *color_offset_y;
-} font_data;
+
 
 SDL_Rect font_src(font_data *fd, char C, int color)
 {
@@ -63,9 +60,6 @@ void display_string(SDL_Renderer *renderer, SDL_Texture *sheet, font_data *fd, c
         SDL_RenderCopy(renderer, sheet, &src, &(SDL_Rect){x + (i * w), y, w, h});
     }
 }
-
-#define TILE_WIDTH 32
-#define TILE_HEIGHT 32
 
 map_str_int sprite_id_map;
 SDL_Texture *sheet;
@@ -347,8 +341,12 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    SDL_CreateWindowAndRenderer(60 * 32, 24 * 32, SDL_WINDOW_MAXIMIZED, &window, &renderer);
+    SDL_CreateWindowAndRenderer( 200, 100, SDL_WINDOW_MAXIMIZED, &window, &renderer );
     SDL_SetWindowTitle(window, PACKAGE_STRING);
+
+    SDL_SetRenderDrawColor(renderer, 6, 6, 6, 0);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
 
     sheet = IMG_LoadTexture(renderer, "./assets/loveable_rogue_sheet.png");
 
@@ -628,6 +626,7 @@ void playit()
             }
         }
 
+/* RENDER THE WHOLE MAP        
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -663,9 +662,8 @@ void playit()
 
         SDL_Rect pdst = (SDL_Rect){ hero.x * TILE_WIDTH, hero.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT};
         SDL_RenderCopy(renderer, sheet, sprite_srcs + ok_map_get(&sprite_id_map, "PLAYER")-1, &pdst );
-        
-
-        SDL_RenderPresent(renderer);
+*/ 
+        //SDL_RenderPresent(renderer);
     }
 }
 

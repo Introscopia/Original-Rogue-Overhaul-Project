@@ -1,11 +1,63 @@
 #ifndef I_CURSES_INCLUDED
 #define I_CURSES_INCLUDED
 
-#define stdscr 0
-#define wmove NOOP
-#define waddch NOOP
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
+
+#include "ok_lib.h"
+
+
+typedef struct font_data_struct
+{
+    map_int_int charIDs;
+    int pitch, w, h;
+    int offset_x;
+    int *color_offset_y;
+} font_data;
+
+
+extern SDL_Window *window;
+extern SDL_Renderer *renderer;
+extern TTF_Font *gFont;
+
+extern map_str_int sprite_id_map;
+extern SDL_Texture *sheet;
+extern SDL_Rect wall_srcs[16];
+extern SDL_Rect sprite_srcs[42];
+extern SDL_Rect map_wall_srcs[16];
+extern SDL_Rect map_icon_srcs[14];
+extern map_int_int char_sprite_map;
+extern font_data FD;
+//map_str_int font_colors_map; for this we would have to save the names of the color blocks too...
+extern SDL_Rect AMULET_src;// = (SDL_Rect){0, 0, 0, 0};
+extern SDL_Rect LOGO_src;// = (SDL_Rect){0, 0, 0, 0};
+extern SDL_Rect RIP_src;// = (SDL_Rect){0, 0, 0, 0};
+extern SDL_Rect GRAVE_src;// = (SDL_Rect){0, 0, 0, 0};
+extern SDL_Rect GRAVE_ORNAMENTS_srcs[3];
+//for (int i = 0; i < 3; ++i)
+//    GRAVE_ORNAMENTS_srcs[i] = (SDL_Rect){0, 0, 0, 0};
+
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 16
+
+
+
+#define WINDOW void
+
+#define stdscr NULL
+
+//#define wmove NOOP
+int wmove(WINDOW *win, int y, int x);
+
+//#define waddch NOOP
+int waddch(WINDOW *win, char ch);
+
 #define waddnstr NOOP
-#define refresh NOOP
+
+//#define refresh NOOP
+int refresh(void);
+
 #define wrefresh NOOP
 #define LINES 24
 #define wattrset 0
@@ -67,5 +119,8 @@
 #define mvwaddch NOOP
 #define getmaxx NOOP
 #define getmaxy NOOP
+
+//from io.c
+#define show_win NOOP
 
 #endif
