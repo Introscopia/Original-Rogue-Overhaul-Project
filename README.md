@@ -25,11 +25,25 @@ Distributed under BSD License (see LICENSE.TXT).
 Cloned from https://github.com/Davidslv/rogue.git
 ```
 
-Build as follows:
+## Build
+
+Update the `INCLUDES` and `LIBS` in `Makefile` to point to your SDL libraries. (Todo: Add pkg-config for linux and come up with a better way for Windows)
 
 ```
-         ./configure --enable-ncurses --enable-wizardmode
+make [-j8]
 ```
+
+```
+bin\rogue.exe
+```
+
+Clean with:
+
+```
+make clean
+```
+
+Right now the rest of the make targets will likely break, still cleaning those up.
 
 ## Options and Features
 
