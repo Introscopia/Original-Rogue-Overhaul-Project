@@ -12,7 +12,7 @@
  */
 
 #include <stdlib.h>
-// #include <curses.h>
+#include "i_curses.h"
 #include <string.h>
 #include <ctype.h>
 #include "rogue.h"

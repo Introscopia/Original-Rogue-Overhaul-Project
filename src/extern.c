@@ -10,7 +10,7 @@
  * See the file LICENSE.TXT for full copyright and licensing information.
  */
 
-// #include <curses.h>
+#include "i_curses.h"
 #include "rogue.h"
 
 #define TRUE true

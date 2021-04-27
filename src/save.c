@@ -16,7 +16,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
-// #include <curses.h>
+#include "i_curses.h"
 #include "rogue.h"
 #include "score.h"
 

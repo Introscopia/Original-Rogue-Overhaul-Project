@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include "rogue.h"
+#include "i_curses.h"
 #include "basics.h"
 #include "ok_lib.h"
 #include "util.h"
@@ -63,8 +64,8 @@ void display_string(SDL_Renderer *renderer, SDL_Texture *sheet, font_data *fd, c
     }
 }
 
-#define TILE_WIDTH 16
-#define TILE_HEIGHT 16
+#define TILE_WIDTH 32
+#define TILE_HEIGHT 32
 
 map_str_int sprite_id_map;
 SDL_Texture *sheet;
